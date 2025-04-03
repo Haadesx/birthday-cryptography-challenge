@@ -84,6 +84,55 @@
         text-align: center;
         margin-top: 20px;
     }
+    
+    /* Mobile improvements */
+    @media (max-width: 768px) {
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 30px;  /* Extra space for touch */
+        }
+        
+        .file-upload-text {
+            height: 50px;  /* Larger touch target */
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-upload-text:after {
+            width: 100px;
+            font-size: 16px;
+        }
+        
+        .file-upload-input {
+            height: 50px;
+        }
+        
+        /* Make buttons larger for touch */
+        .btn {
+            padding: 12px 15px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        /* Fix content that might disappear */
+        .card, .tab-pane {
+            min-height: 400px;
+        }
+        
+        /* Ensure tab content stays visible */
+        .tab-content {
+            height: auto !important;
+            overflow: visible !important;
+        }
+        
+        /* Prevent unwanted scrolling/bouncing */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -104,17 +153,31 @@
                 
                 <div class="stego-info">
                     <h5><i class="fas fa-lightbulb me-2"></i>How it Works</h5>
-                    <p>This tool uses the LSB (Least Significant Bit) technique to hide data in images:</p>
+                    <p>This tool uses an enhanced LSB (Least Significant Bit) technique to hide data in images:</p>
                     <ol>
                         <li>Your message is encrypted using a password</li>
                         <li>The encrypted data is converted to binary</li>
-                        <li>Each bit is stored in the least significant bit of image pixels</li>
+                        <li>The bits are distributed across all color channels for better resilience</li>
+                        <li>Multiple copies of critical data are stored for error correction</li>
                         <li>The changes are visually imperceptible</li>
                     </ol>
                 </div>
                 
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle me-2"></i>Remember your password! Without it, you won't be able to recover the hidden message.
+                </div>
+                
+                <div class="alert alert-danger mt-3">
+                    <h5><i class="fas fa-share-alt me-2"></i>Important: Cross-Device Compatibility</h5>
+                    <p><strong>For best results:</strong></p>
+                    <ul>
+                        <li>Always use <strong>PNG format</strong> (never JPG/JPEG)</li>
+                        <li>Use larger images (at least 500x500 pixels) for better resilience</li>
+                        <li>When sharing, use direct file transfer methods (email attachments, cloud storage links, USB drives)</li>
+                        <li><strong>NEVER</strong> use screenshots, social media uploads, or messaging apps that compress images</li>
+                        <li>If sending via WhatsApp/Telegram, use "Document" mode, not "Photo" mode</li>
+                        <li>For iOS devices, use "Actual Size" when sharing images</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -142,6 +205,15 @@
                         <h4><i class="fas fa-hide me-2"></i>Hide a Secret Message</h4>
                     </div>
                     <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i><strong>Cross-Device Requirements:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Use PNG format images only! (JPG/JPEG will corrupt the hidden data)</li>
+                                <li>Larger images work better (500x500 pixels or larger)</li>
+                                <li>Simpler images with fewer colors work best</li>
+                            </ul>
+                        </div>
+                        
                         <form id="hide-form" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="hide-message" class="form-label">Secret Message</label>
@@ -157,10 +229,10 @@
                             <div class="mb-3">
                                 <label for="hide-image" class="form-label">Select Image</label>
                                 <div class="file-upload-wrapper">
-                                    <input type="file" class="file-upload-input" id="hide-image" name="image" accept="image/*" required>
+                                    <input type="file" class="file-upload-input" id="hide-image" name="image" accept="image/png, image/bmp, image/tiff" required>
                                     <div class="file-upload-text"><i class="fas fa-image me-2"></i>Choose an image file...</div>
                                 </div>
-                                <div class="form-text text-light">Supported formats: JPG, PNG, GIF</div>
+                                <div class="form-text text-light">Recommended format: PNG for best results</div>
                             </div>
                             
                             <div id="hide-preview-container" style="display: none;">
@@ -175,7 +247,23 @@
                         
                         <div id="hide-result" style="display: none;">
                             <div class="alert alert-success mt-4">
-                                <i class="fas fa-check-circle me-2"></i>Message hidden successfully!
+                                <i class="fas fa-check-circle me-2"></i><span id="success-message">Message hidden successfully!</span>
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <h5><i class="fas fa-share-alt me-2"></i>Sharing Instructions for All Devices</h5>
+                                <p>To ensure the recipient can extract your hidden message:</p>
+                                <ol>
+                                    <li>Download the image using the button below</li>
+                                    <li>Share the <strong>original PNG file</strong> using one of these methods:</li>
+                                    <ul>
+                                        <li><strong>Email:</strong> Send as attachment (not embedded/inline)</li>
+                                        <li><strong>Cloud:</strong> Share via Google Drive, Dropbox, or similar services</li>
+                                        <li><strong>Direct:</strong> AirDrop, Bluetooth, or USB transfer</li>
+                                        <li><strong>Messaging apps:</strong> Send as document/file, NOT as photo</li>
+                                    </ul>
+                                    <li><strong>AVOID:</strong> Taking screenshots, image compression, or photo sharing</li>
+                                </ol>
                             </div>
                             
                             <div class="image-card">
@@ -184,10 +272,6 @@
                                 <a id="download-link" href="#" class="btn btn-secondary mt-3" download>
                                     <i class="fas fa-download me-2"></i>Download Image
                                 </a>
-                            </div>
-                            
-                            <div class="alert alert-info mt-3">
-                                <i class="fas fa-info-circle me-2"></i>To reveal the message later, you'll need this image and the password you used.
                             </div>
                         </div>
                     </div>
@@ -201,6 +285,10 @@
                         <h4><i class="fas fa-search me-2"></i>Reveal a Hidden Message</h4>
                     </div>
                     <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i><strong>Note:</strong> Use the original PNG file directly. Screenshots or re-saved images may not work correctly.
+                        </div>
+                        
                         <form id="reveal-form" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="reveal-password" class="form-label">Password</label>
@@ -253,6 +341,50 @@
 
 {% block extra_js %}
 <script>
+    console.log("Steganography page loaded");
+    
+    // Prevent any automatic redirects
+    window.onbeforeunload = function() {
+        console.log("Attempting to leave page - intercepted");
+        return "Are you sure you want to leave this page?";
+    };
+    
+    // Check periodically if the page is still visible
+    setInterval(function() {
+        console.log("Page visibility check: " + document.visibilityState);
+        // Force the page to stay in the DOM
+        document.body.style.display = "block";
+    }, 1000);
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded");
+        
+        // Fix tabs for mobile - prevent them from disappearing
+        const tabElements = document.querySelectorAll('[data-bs-toggle="tab"]');
+        if (tabElements) {
+            console.log("Found tab elements:", tabElements.length);
+            
+            tabElements.forEach(function(tabEl) {
+                tabEl.addEventListener('shown.bs.tab', function(event) {
+                    console.log("Tab shown:", event.target.getAttribute('data-bs-target'));
+                    
+                    // Force the tab pane to be visible
+                    const targetId = event.target.getAttribute('data-bs-target');
+                    const targetPane = document.querySelector(targetId);
+                    
+                    if (targetPane) {
+                        console.log("Ensuring tab pane visibility");
+                        targetPane.style.display = "block";
+                        targetPane.style.visibility = "visible";
+                        targetPane.style.opacity = "1";
+                        targetPane.style.height = "auto";
+                        targetPane.style.overflow = "visible";
+                    }
+                });
+            });
+        }
+    });
+    
     // File upload preview for hiding
     document.getElementById('hide-image').addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -293,52 +425,115 @@
     document.getElementById('hide-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const formData = new FormData();
-        formData.append('message', document.getElementById('hide-message').value);
-        formData.append('password', document.getElementById('hide-password').value);
-        formData.append('image', document.getElementById('hide-image').files[0]);
-        
-        // Show loading state
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-        submitBtn.disabled = true;
-        
-        fetch('/api/encode-image', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Reset button state
-            submitBtn.innerHTML = originalBtnText;
-            submitBtn.disabled = false;
-            
-            if (data.success) {
-                // Display success result
-                document.getElementById('hide-result').style.display = 'block';
-                
-                // Set the image source and download link
-                const downloadUrl = '/download/' + data.filename;
-                document.getElementById('result-image').src = downloadUrl;
-                document.getElementById('download-link').href = downloadUrl;
-                
-                // Scroll to the result
-                document.getElementById('hide-result').scrollIntoView({
-                    behavior: 'smooth'
-                });
-            } else {
-                alert('Error: ' + data.error);
+        // Check if image is PNG
+        const imageFile = document.getElementById('hide-image').files[0];
+        if (imageFile) {
+            const fileExt = imageFile.name.split('.').pop().toLowerCase();
+            if (fileExt !== 'png' && fileExt !== 'bmp' && fileExt !== 'tiff') {
+                if (!confirm('For best results across devices, please use PNG format images. JPG/JPEG images may lose the hidden data when shared. Continue anyway?')) {
+                    return;
+                }
             }
-        })
-        .catch(error => {
-            // Reset button state
-            submitBtn.innerHTML = originalBtnText;
-            submitBtn.disabled = false;
             
-            console.error('Error:', error);
-            alert('An error occurred while processing the image.');
-        });
+            // Check image dimensions if possible
+            const img = new Image();
+            img.onload = function() {
+                if (this.width < 300 || this.height < 300) {
+                    if (!confirm(`This image is small (${this.width}x${this.height}). Smaller images may not work well across devices. We recommend images at least 500x500 pixels. Continue anyway?`)) {
+                        return;
+                    }
+                }
+                processImageHiding();
+            };
+            
+            // Set up image source from file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(imageFile);
+        } else {
+            processImageHiding();
+        }
+        
+        function processImageHiding() {
+            const formData = new FormData();
+            formData.append('message', document.getElementById('hide-message').value);
+            formData.append('password', document.getElementById('hide-password').value);
+            formData.append('image', imageFile);
+            
+            // Show loading state
+            const submitBtn = document.querySelector('#hide-form button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            submitBtn.disabled = true;
+            
+            fetch('/api/encode-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset button state
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                
+                if (data.success) {
+                    // Display success result and server message
+                    document.getElementById('hide-result').style.display = 'block';
+                    document.getElementById('success-message').textContent = data.message.split('!')[0] + '!';
+                    
+                    // Set the image source and download link
+                    const downloadUrl = '/download/' + data.filename;
+                    document.getElementById('result-image').src = downloadUrl;
+                    document.getElementById('download-link').href = downloadUrl;
+                    
+                    // Display tips if available
+                    if (data.tips && Array.isArray(data.tips) && data.tips.length > 0) {
+                        const tipsListEl = document.createElement('ul');
+                        tipsListEl.className = 'mt-2';
+                        
+                        data.tips.forEach(tip => {
+                            const tipEl = document.createElement('li');
+                            tipEl.textContent = tip;
+                            tipsListEl.appendChild(tipEl);
+                        });
+                        
+                        // Find the warning alert and append tips
+                        const warningAlert = document.querySelector('#hide-result .alert-warning');
+                        if (warningAlert) {
+                            // Check if tips are already there
+                            const existingTips = warningAlert.querySelector('.device-tips');
+                            if (existingTips) {
+                                existingTips.innerHTML = '';
+                                existingTips.appendChild(tipsListEl);
+                            } else {
+                                const tipsContainer = document.createElement('div');
+                                tipsContainer.className = 'device-tips mt-3';
+                                tipsContainer.innerHTML = '<strong>Device Compatibility Tips:</strong>';
+                                tipsContainer.appendChild(tipsListEl);
+                                warningAlert.appendChild(tipsContainer);
+                            }
+                        }
+                    }
+                    
+                    // Scroll to the result
+                    document.getElementById('hide-result').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                // Reset button state
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                
+                console.error('Error:', error);
+                alert('An error occurred while processing the image.');
+            });
+        }
     });
     
     // Reveal message form submission
@@ -370,6 +565,14 @@
                 document.getElementById('revealed-message').textContent = data.message;
                 document.getElementById('reveal-result').style.display = 'block';
                 
+                // Display warning if present
+                if (data.warning) {
+                    const warningDiv = document.createElement('div');
+                    warningDiv.className = 'alert alert-warning mt-3';
+                    warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${data.warning}`;
+                    document.getElementById('reveal-result').prepend(warningDiv);
+                }
+                
                 // Scroll to the result
                 document.getElementById('reveal-result').scrollIntoView({
                     behavior: 'smooth'
@@ -398,6 +601,111 @@
         document.execCommand('copy');
         document.body.removeChild(textarea);
         alert('Message copied to clipboard!');
+    });
+
+    // Initialize Bootstrap tabs properly
+    document.addEventListener('DOMContentLoaded', function() {
+        // Manually initialize tabs
+        const tabList = document.getElementById('stegoTab');
+        if (tabList) {
+            // First ensure all tab panes are loaded in the DOM
+            document.querySelectorAll('.tab-pane').forEach(function(pane) {
+                // Make sure initial display style doesn't interfere
+                if (pane.classList.contains('show') && pane.classList.contains('active')) {
+                    pane.style.display = 'block';
+                }
+            });
+            
+            // Initialize tabs with manual triggers
+            const tabs = document.querySelectorAll('#stegoTab button');
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all content
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                        pane.style.display = 'none';
+                    });
+                    
+                    // Show the target content
+                    const target = document.querySelector(this.dataset.bsTarget);
+                    if (target) {
+                        target.classList.add('show', 'active');
+                        target.style.display = 'block';
+                        console.log("Manually activated tab:", this.dataset.bsTarget);
+                    }
+                });
+            });
+            
+            // Ensure the active tab is visible
+            setTimeout(function() {
+                const activeTab = document.querySelector('#stegoTab button.active');
+                if (activeTab) {
+                    const target = document.querySelector(activeTab.dataset.bsTarget);
+                    if (target) {
+                        target.style.display = 'block';
+                        console.log("Ensuring initial tab is visible");
+                    }
+                }
+            }, 500);
+        }
+    });
+
+    // Enhance mobile detection and handling
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect mobile devices more comprehensively
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                          (window.innerWidth <= 768);
+        
+        if (isMobile) {
+            console.log("Mobile device detected, applying enhanced mobile optimizations");
+            document.body.classList.add('mobile-device');
+            
+            // Fix image preview sizing on mobile
+            const imagePreviewStyle = document.createElement('style');
+            imagePreviewStyle.textContent = `
+                .image-preview {
+                    max-height: 200px;
+                    width: auto;
+                    object-fit: contain;
+                }
+                
+                .file-upload-wrapper {
+                    margin-bottom: 30px;
+                }
+                
+                .file-upload-text {
+                    height: 50px;
+                    padding: 0 15px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .btn {
+                    min-height: 48px;
+                    padding: 12px 20px;
+                }
+            `;
+            document.head.appendChild(imagePreviewStyle);
+            
+            // Enhance file inputs for better mobile experience
+            document.querySelectorAll('.file-upload-input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.border = '2px solid var(--primary-color)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.border = 'none';
+                });
+            });
+        }
     });
 </script>
 {% endblock %} 

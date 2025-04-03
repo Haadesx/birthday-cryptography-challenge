@@ -20,16 +20,21 @@ var/
 .installed.cfg
 *.egg
 
-# Virtual environment
+# Virtual Environment
 venv/
 ENV/
-env/
 
-# Flask
+# Flask stuff
 instance/
 .webassets-cache
 
-# User uploads
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
 uploads/
 
 # Misc
@@ -38,10 +43,6 @@ uploads/
 .flaskenv
 *.db
 *.sqlite3
-.idea/
-.vscode/
-
-# Local configuration
 .env.local
 .env.development.local
 .env.test.local

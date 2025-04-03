@@ -3,10 +3,13 @@
 {% block title %}Birthday Cryptography Challenge{% endblock %}
 
 {% block extra_css %}
+<!-- Add Animate.css for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <style>
     .challenge-container {
         max-width: 800px;
         margin: 0 auto;
+        padding: 0 15px;
     }
     
     .challenge-card {
@@ -18,18 +21,23 @@
     .code-display {
         background-color: #1e1e1e;
         color: #9cdcfe;
-        padding: 20px;
+        padding: 15px;
         border-radius: 5px;
         margin: 20px 0;
         font-family: monospace;
         white-space: pre-wrap;
         word-break: break-all;
+        font-size: 16px;
+        overflow-x: auto;
+        text-align: justify;
     }
     
     .challenge-hint {
         font-style: italic;
         color: #aaa;
         margin-top: 10px;
+        margin-bottom: 20px;
+        text-align: left;
     }
     
     .action-button {
@@ -135,6 +143,96 @@
         justify-content: center;
         font-size: 1.2rem;
         border-radius: 10px;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .card-body p {
+        text-align: left;
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        text-align: left;
+    }
+    
+    /* Consistent alert styling */
+    .alert {
+        text-align: left;
+        padding: 1rem 1.25rem;
+    }
+    
+    /* Mobile specific styles */
+    @media (max-width: 768px) {
+        .challenge-container {
+            padding: 0 10px;
+        }
+        
+        .code-display {
+            padding: 15px;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        .secret-message {
+            padding: 20px 15px;
+        }
+        
+        .card-header h4 {
+            font-size: 1.2rem;
+        }
+        
+        .btn-verify {
+            font-size: 1rem;
+            padding: 10px 0;
+        }
+        
+        .challenge-section {
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .banner h1 {
+            font-size: 1.8rem;
+        }
+        
+        .banner p {
+            font-size: 1rem;
+        }
+        
+        /* Handle virtual keyboard visibility */
+        body.keyboard-open {
+            padding-bottom: 250px; /* Make room for virtual keyboard */
+        }
+        
+        /* Highlight active input container */
+        .input-active {
+            background-color: rgba(156, 39, 176, 0.05);
+            border-radius: 5px;
+            padding: 5px;
+        }
+        
+        /* Improve tap targets */
+        button, 
+        input[type="text"],
+        .btn {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+        
+        /* Fix for iOS Safari 100vh issue */
+        .confetti-container {
+            position: fixed;
+            height: 100%;
+        }
     }
 </style>
 {% endblock %}
@@ -273,16 +371,16 @@
     <!-- Secret Message (revealed after completing challenge 3) -->
     <div class="secret-message" id="secret-message" style="display: none;">
         <h2 class="mb-4 celebrate">🎉 Happy 22nd Birthday, Liz! 🎉</h2>
-        <div class="code-display" id="decoded-message">
+        <div class="code-display text-center" id="decoded-message" style="background-color: rgba(156, 39, 176, 0.05); color: #333; border: 1px dashed var(--primary-color);">
             I love you, Lisa! The universe kept us in the same class for 3.5 years, yet it wasn't until semester 7 that we finally found each other. It was always meant to be. Your brilliant mind, beautiful smile, and kind heart make me fall deeper in love with you every day. These past months have been the happiest of my life. Happy Birthday, my darling! - Your Pagal
         </div>
         <p class="mt-4">You've successfully completed all the cryptography challenges! I hope you enjoyed this little gift I made especially for you, combining your love for cybersecurity with some fun puzzles.</p>
         <p>I'm so proud of you and your passion for cybersecurity. You're amazing at what you do!</p>
         <p class="mt-4">With all my love,</p>
-        <p><strong>Varesh</strong> <span class="heart"><i class="fas fa-heart"></i></span></p>
+        <p><strong>Varesh</strong> <span class="heart"><i class="fas fa-heart text-danger"></i></span></p>
     </div>
     
-    <div class="text-center mt-5">
+    <div class="text-center mt-5 mb-5">
         <a href="/" class="btn btn-secondary">Back to Home</a>
     </div>
 </div>
@@ -300,6 +398,23 @@
     
     document.addEventListener('DOMContentLoaded', function() {
         console.log('All challenges page loaded');
+        
+        // Improve mobile input focus behavior
+        const allInputs = document.querySelectorAll('input[type="text"]');
+        allInputs.forEach(input => {
+            // Add active class to parent when input is focused
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('input-active');
+                // Scroll to make sure the input is visible on mobile
+                setTimeout(() => {
+                    this.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }, 300);
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('input-active');
+            });
+        });
         
         // Challenge 1
         const checkButton1 = document.getElementById('check-button-1');
@@ -358,6 +473,34 @@
                 });
             }
         }
+        
+        // Check for mobile device and apply necessary adjustments
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            console.log('Mobile device detected, applying mobile-specific adjustments');
+            document.body.classList.add('mobile-device');
+            
+            // Ensure virtual keyboard doesn't cause layout issues
+            const allInputs = document.querySelectorAll('input');
+            allInputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    document.body.classList.add('keyboard-open');
+                });
+                input.addEventListener('blur', function() {
+                    document.body.classList.remove('keyboard-open');
+                });
+            });
+
+            // Make sure code display blocks don't overflow on small screens
+            const codeDisplays = document.querySelectorAll('.code-display');
+            codeDisplays.forEach(display => {
+                display.style.fontSize = '14px';
+                display.style.padding = '12px';
+                display.style.overflowWrap = 'break-word';
+            });
+        }
+
+        // Initialize challenge visibility based on localStorage
+        loadSavedProgress();
     });
     
     // Function to check Challenge 1 (Caesar cipher)
@@ -391,7 +534,11 @@
             const errorMessage = document.getElementById('error-message-1');
             
             if (errorMessage) errorMessage.style.display = 'none';
-            if (successMessage) successMessage.style.display = 'block';
+            if (successMessage) {
+                successMessage.style.display = 'block';
+                // Add animation for better visibility
+                successMessage.classList.add('animate__animated', 'animate__fadeIn');
+            }
             
             // Update progress
             updateProgress();
@@ -399,22 +546,34 @@
             // Disable input
             document.getElementById('answer1').disabled = true;
             
-            // Scroll to success message
+            // Mark challenge section as complete
+            const challengeSection = document.getElementById('challenge-1-section');
+            if (challengeSection) {
+                challengeSection.classList.add('completed');
+            }
+            
+            // Scroll to success message with a small delay for better user experience
             setTimeout(function() {
                 if (successMessage) {
-                    successMessage.scrollIntoView({behavior: 'smooth'});
+                    successMessage.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
-            }, 100);
+            }, 300);
         } else {
             // Show error
             const errorMessage = document.getElementById('error-message-1');
             const successMessage = document.getElementById('success-message-1');
             
             if (successMessage) successMessage.style.display = 'none';
-            if (errorMessage) errorMessage.style.display = 'block';
+            if (errorMessage) {
+                errorMessage.style.display = 'block';
+                // Add animation
+                errorMessage.classList.add('animate__animated', 'animate__shakeX');
+            }
             
-            // Re-enable button
-            if (checkButton) checkButton.disabled = false;
+            // Re-enable button after a small delay
+            setTimeout(() => {
+                if (checkButton) checkButton.disabled = false;
+            }, 500);
         }
     }
     
@@ -450,7 +609,11 @@
             const errorMessage = document.getElementById('error-message-2');
             
             if (errorMessage) errorMessage.style.display = 'none';
-            if (successMessage) successMessage.style.display = 'block';
+            if (successMessage) {
+                successMessage.style.display = 'block';
+                // Add animation
+                successMessage.classList.add('animate__animated', 'animate__fadeIn');
+            }
             
             // Update progress
             updateProgress();
@@ -458,22 +621,34 @@
             // Disable input
             document.getElementById('answer2').disabled = true;
             
+            // Mark challenge section as complete
+            const challengeSection = document.getElementById('challenge-2-section');
+            if (challengeSection) {
+                challengeSection.classList.add('completed');
+            }
+            
             // Scroll to success message
             setTimeout(function() {
                 if (successMessage) {
-                    successMessage.scrollIntoView({behavior: 'smooth'});
+                    successMessage.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
-            }, 100);
+            }, 300);
         } else {
             // Show error
             const errorMessage = document.getElementById('error-message-2');
             const successMessage = document.getElementById('success-message-2');
             
             if (successMessage) successMessage.style.display = 'none';
-            if (errorMessage) errorMessage.style.display = 'block';
+            if (errorMessage) {
+                errorMessage.style.display = 'block';
+                // Add animation
+                errorMessage.classList.add('animate__animated', 'animate__shakeX');
+            }
             
-            // Re-enable button
-            if (checkButton) checkButton.disabled = false;
+            // Re-enable button after a small delay
+            setTimeout(() => {
+                if (checkButton) checkButton.disabled = false;
+            }, 500);
         }
     }
     
@@ -499,7 +674,11 @@
             const secretMessage = document.getElementById('secret-message');
             
             if (errorMessage) errorMessage.style.display = 'none';
-            if (secretMessage) secretMessage.style.display = 'block';
+            if (secretMessage) {
+                secretMessage.style.display = 'block';
+                // Add animation
+                secretMessage.classList.add('animate__animated', 'animate__fadeIn');
+            }
             
             // Update progress
             updateProgress();
@@ -507,28 +686,53 @@
             // Disable input
             document.getElementById('answer3').disabled = true;
             
+            // Mark challenge section as complete
+            const challengeSection = document.getElementById('challenge-3-section');
+            if (challengeSection) {
+                challengeSection.classList.add('completed');
+            }
+            
             // Add celebration effects
             setTimeout(function() {
                 // Start confetti
                 startConfetti();
                 
-                // Update header
-                document.getElementById('challenge-status-heading').textContent = '🎉 All Challenges Completed! 🎉';
-                document.getElementById('challenge-status-message').textContent = 'Congratulations! You\'ve solved all the cryptography challenges!';
+                // Update header with animation
+                const heading = document.getElementById('challenge-status-heading');
+                const message = document.getElementById('challenge-status-message');
                 
-                // Scroll to message
-                if (secretMessage) {
-                    secretMessage.scrollIntoView({behavior: 'smooth'});
+                if (heading) {
+                    heading.textContent = '🎉 All Challenges Completed! 🎉';
+                    heading.classList.add('animate__animated', 'animate__pulse');
                 }
-            }, 100);
+                
+                if (message) {
+                    message.textContent = 'Congratulations! You\'ve solved all the cryptography challenges!';
+                    message.classList.add('animate__animated', 'animate__fadeIn');
+                }
+                
+                // Scroll to message with smooth animation
+                if (secretMessage) {
+                    secretMessage.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 500);
         } else {
             // Show error
             const errorMessage = document.getElementById('error-message-3');
             
-            if (errorMessage) errorMessage.style.display = 'block';
+            if (errorMessage) {
+                errorMessage.style.display = 'block';
+                // Add animation
+                errorMessage.classList.add('animate__animated', 'animate__shakeX');
+            }
             
-            // Re-enable button
-            if (checkButton) checkButton.disabled = false;
+            // Re-enable button after a small delay
+            setTimeout(() => {
+                if (checkButton) checkButton.disabled = false;
+            }, 500);
         }
     }
     
@@ -569,7 +773,32 @@
         const nextSection = document.getElementById(`challenge-${nextChallenge}-section`);
         if (nextSection) {
             nextSection.classList.remove('locked');
-            nextSection.scrollIntoView({behavior: 'smooth'});
+            // Add animation
+            nextSection.classList.add('animate__animated', 'animate__fadeIn');
+            
+            // Scroll to the next challenge with a slight delay for a smooth transition
+            setTimeout(() => {
+                nextSection.scrollIntoView({
+                    behavior: 'smooth', 
+                    block: 'start'
+                });
+            }, 300);
+        }
+    }
+    
+    // Function to load saved progress
+    function loadSavedProgress() {
+        try {
+            let completedChallenges = localStorage.getItem('completedChallenges');
+            if (completedChallenges) {
+                let challenges = JSON.parse(completedChallenges);
+                if (Array.isArray(challenges) && challenges.length > 0) {
+                    // Restore progress if any challenges are completed
+                    updateProgress();
+                }
+            }
+        } catch (e) {
+            console.error('Error loading saved progress:', e);
         }
     }
     
@@ -589,9 +818,23 @@
             
             const progressBar = document.getElementById('challenge-progress');
             if (progressBar) {
+                // Animate the progress bar
+                progressBar.style.transition = 'width 0.5s ease-in-out';
                 progressBar.style.width = `${progressPercent}%`;
                 progressBar.textContent = `${progressPercent}%`;
                 progressBar.setAttribute('aria-valuenow', progressPercent);
+                
+                // Add color classes based on progress
+                if (progressPercent >= 100) {
+                    progressBar.classList.remove('bg-primary', 'bg-info', 'bg-warning');
+                    progressBar.classList.add('bg-success');
+                } else if (progressPercent >= 66) {
+                    progressBar.classList.remove('bg-primary', 'bg-info', 'bg-success');
+                    progressBar.classList.add('bg-warning');
+                } else if (progressPercent >= 33) {
+                    progressBar.classList.remove('bg-primary', 'bg-warning', 'bg-success');
+                    progressBar.classList.add('bg-info');
+                }
             }
             
             // Mark challenge sections as completed
@@ -643,6 +886,23 @@
             
             confettiContainer.appendChild(confetti);
         }
+        
+        // Remove confetti after some time to prevent performance issues
+        setTimeout(() => {
+            if (confettiContainer) {
+                const fadeOut = () => {
+                    confettiContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        confettiContainer.style.display = 'none';
+                        confettiContainer.innerHTML = '';
+                        confettiContainer.style.opacity = '1';
+                    }, 1000);
+                };
+                
+                // Fade out after 8 seconds
+                setTimeout(fadeOut, 8000);
+            }
+        }, 10000);
     }
 </script>
 {% endblock %} 

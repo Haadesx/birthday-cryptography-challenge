@@ -6,7 +6,9 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.9"
+        "runtime": "python3.9",
+        "pythonVersion": "3.9",
+        "installCommand": "bash vercel-build.sh"
       }
     }
   ],
@@ -17,7 +19,7 @@
     }
   ],
   "env": {
-    "PYTHONUNBUFFERED": "1"
-  },
-  "buildCommand": "pip install -r build_requirements.txt && pip install -r requirements.txt"
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "/vercel/path0"
+  }
 } 

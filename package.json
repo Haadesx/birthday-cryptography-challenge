@@ -1,0 +1,13 @@
+{
+  "name": "birthday-cryptography-challenge",
+  "version": "1.0.0",
+  "description": "Birthday Cryptography Challenge",
+  "private": true,
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "prebuild": "python vercel-prebuild.py",
+    "build": "pip install -r requirements.txt"
+  }
+} 

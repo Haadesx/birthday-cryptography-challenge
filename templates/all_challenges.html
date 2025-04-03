@@ -1,0 +1,648 @@
+{% extends "base.html" %}
+
+{% block title %}Birthday Cryptography Challenge{% endblock %}
+
+{% block extra_css %}
+<style>
+    .challenge-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .challenge-card {
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 30px;
+        margin-top: 30px;
+    }
+    
+    .code-display {
+        background-color: #1e1e1e;
+        color: #9cdcfe;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .challenge-hint {
+        font-style: italic;
+        color: #aaa;
+        margin-top: 10px;
+    }
+    
+    .action-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+    }
+    
+    .btn-verify {
+        margin-top: 15px;
+        padding: 12px 0;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+    
+    .secret-message {
+        background-color: rgba(156, 39, 176, 0.1);
+        border: 2px dashed var(--primary-color);
+        border-radius: 10px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+    }
+    
+    .celebrate {
+        animation: celebrate 2s infinite;
+    }
+    
+    @keyframes celebrate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .challenge-section {
+        margin-bottom: 50px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    
+    .challenge-section.locked {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    
+    .challenge-section.completed {
+        border-color: #4CAF50;
+    }
+    
+    .completion-badge {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10px;
+    }
+    
+    .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
+    
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: var(--primary-color);
+        opacity: 0.8;
+        animation: fall 5s ease-in infinite;
+    }
+    
+    @keyframes fall {
+        0% {
+            top: -10%;
+            transform: translateX(0) rotate(0deg);
+        }
+        100% {
+            top: 100%;
+            transform: translateX(100px) rotate(360deg);
+        }
+    }
+    
+    .locked-message {
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-gift me-3"></i>Birthday Cryptography Challenge<i class="fas fa-gift ms-3"></i></h1>
+    <p>Solve these special birthday challenges to reveal a secret message</p>
+</div>
+
+<div class="challenge-container">
+    <div class="secret-message mb-4">
+        <div id="intro-icon" class="challenge-icon celebration-icon">
+            <i class="fas fa-birthday-cake"></i>
+        </div>
+        <h2 class="mb-3" id="challenge-status-heading">Happy Birthday, Liz!</h2>
+        <p class="lead" id="challenge-status-message">Complete all three cryptography challenges below to reveal a special birthday message just for you.</p>
+        <div class="progress mt-4">
+            <div class="progress-bar" id="challenge-progress" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+    </div>
+    
+    <!-- Challenge 1: Caesar Cipher -->
+    <div class="challenge-section" id="challenge-1-section">
+        <div class="card challenge-card" id="challenge-1">
+            <div class="card-header">
+                <h4><i class="fas fa-exchange-alt me-2"></i>Challenge 1: Caesar Cipher</h4>
+            </div>
+            <div class="card-body">
+                <p>The Caesar cipher is one of the oldest and simplest forms of encrypting messages. Each letter in the plaintext is shifted a certain number of places down the alphabet.</p>
+                
+                <div class="code-display">
+                    lettc fmvxlhec xs qc jezsvmxi gcfivwigyvmxc uyiir pmwe!
+                </div>
+                
+                <p class="challenge-hint"><i class="fas fa-lightbulb me-2"></i>Hint: The shift key is your birth date (4)</p>
+                
+                <div class="mb-4">
+                    <label for="answer1" class="form-label">Your decryption:</label>
+                    <input type="text" class="form-control" id="answer1" placeholder="Enter your decryption here">
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button id="check-button-1" class="btn btn-primary btn-verify w-100 mb-3">
+                        <i class="fas fa-check-circle me-2"></i> Check Answer
+                    </button>
+                </div>
+                
+                <div class="alert alert-success mt-4" id="success-message-1" style="display: none;">
+                    <i class="fas fa-check-circle me-2"></i>Correct! You've decrypted the message: "happy birthday to my favorite cybersecurity queen lisa!"
+                    <div class="mt-3">
+                        <button class="btn btn-success" onclick="unlockNextChallenge(2)">Continue to Challenge 2</button>
+                    </div>
+                </div>
+                
+                <div class="alert alert-danger mt-4" id="error-message-1" style="display: none;">
+                    <i class="fas fa-times-circle me-2"></i>That's not quite right. Remember, the shift key is 4 (your birth date). Try again!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Challenge 2: Vigenère Cipher -->
+    <div class="challenge-section locked" id="challenge-2-section">
+        <div class="card challenge-card" id="challenge-2">
+            <div class="card-header">
+                <h4><i class="fas fa-table me-2"></i>Challenge 2: Vigenère Cipher</h4>
+            </div>
+            <div class="card-body">
+                <p>The Vigenère cipher is a method of encrypting alphabetic text by using a simple form of polyalphabetic substitution. It uses a keyword to shift each letter of the plaintext.</p>
+                
+                <div class="code-display">
+                    i afdp ydl ttz, bp qycgvltbav plczvz rigc!
+                </div>
+                
+                <p class="challenge-hint"><i class="fas fa-lightbulb me-2"></i>Hint: The key is the month of your birthday in lowercase ("april")</p>
+                
+                <div class="mb-4">
+                    <label for="answer2" class="form-label">Your decryption:</label>
+                    <input type="text" class="form-control" id="answer2" placeholder="Enter your decryption here">
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button id="check-button-2" class="btn btn-primary btn-verify w-100 mb-3">
+                        <i class="fas fa-check-circle me-2"></i> Check Answer
+                    </button>
+                </div>
+                
+                <div class="alert alert-success mt-4" id="success-message-2" style="display: none;">
+                    <i class="fas fa-check-circle me-2"></i>Excellent work! You've solved the Vigenère cipher correctly!
+                    <div class="mt-3">
+                        <button class="btn btn-success" onclick="unlockNextChallenge(3)">Continue to Final Challenge</button>
+                    </div>
+                </div>
+                
+                <div class="alert alert-danger mt-4" id="error-message-2" style="display: none;">
+                    <i class="fas fa-times-circle me-2"></i>That's not quite right. Remember to use "april" as the key. Try again!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Challenge 3: Base64 Decoding -->
+    <div class="challenge-section locked" id="challenge-3-section">
+        <div class="card challenge-card" id="challenge-3">
+            <div class="card-header">
+                <h4><i class="fas fa-code me-2"></i>Final Challenge: Base64 Encoded Message</h4>
+            </div>
+            <div class="card-body">
+                <p>Base64 is a group of binary-to-text encoding schemes that represent binary data in an ASCII string format. It's commonly used to encode binary data so it can be safely transmitted over text-based systems.</p>
+                
+                <div class="code-display">
+                    SSBsb3ZlIHlvdSwgTGlzYSEgVGhlIHVuaXZlcnNlIGtlcHQgdXMgaW4gdGhlIHNhbWUgY2xhc3MgZm9yIDMuNSB5ZWFycywgeWV0IGl0IHdhc24ndCB1bnRpbCBzZW1lc3RlciA3IHRoYXQgd2UgZmluYWxseSBmb3VuZCBlYWNoIG90aGVyLiBJdCB3YXMgYWx3YXlzIG1lYW50IHRvIGJlLiBZb3VyIGJyaWxsaWFudCBtaW5kLCBiZWF1dGlmdWwgc21pbGUsIGFuZCBraW5kIGhlYXJ0IG1ha2UgbWUgZmFsbCBkZWVwZXIgaW4gbG92ZSB3aXRoIHlvdSBldmVyeSBkYXkuIFRoZXNlIHBhc3QgbW9udGhzIGhhdmUgYmVlbiB0aGUgaGFwcGllc3Qgb2YgbXkgbGlmZS4gSGFwcHkgQmlydGhkYXksIG15IGRhcmxpbmchIC0gWW91ciBQYWdhbA==
+                </div>
+                
+                <p class="challenge-hint"><i class="fas fa-lightbulb me-2"></i>Hint: Enter "DECODE" to reveal the special birthday message</p>
+                
+                <div class="mb-4">
+                    <label for="answer3" class="form-label">Enter the command:</label>
+                    <input type="text" class="form-control" id="answer3" placeholder="Enter the decode command here">
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button id="check-button-3" class="btn btn-primary btn-verify w-100 mb-3">
+                        <i class="fas fa-terminal me-2"></i> Process Command
+                    </button>
+                </div>
+                
+                <div class="alert alert-danger mt-4" id="error-message-3" style="display: none;">
+                    <i class="fas fa-times-circle me-2"></i>That's not the correct command. Try entering "DECODE" (case insensitive).
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Secret Message (revealed after completing challenge 3) -->
+    <div class="secret-message" id="secret-message" style="display: none;">
+        <h2 class="mb-4 celebrate">🎉 Happy 22nd Birthday, Liz! 🎉</h2>
+        <div class="code-display" id="decoded-message">
+            I love you, Lisa! The universe kept us in the same class for 3.5 years, yet it wasn't until semester 7 that we finally found each other. It was always meant to be. Your brilliant mind, beautiful smile, and kind heart make me fall deeper in love with you every day. These past months have been the happiest of my life. Happy Birthday, my darling! - Your Pagal
+        </div>
+        <p class="mt-4">You've successfully completed all the cryptography challenges! I hope you enjoyed this little gift I made especially for you, combining your love for cybersecurity with some fun puzzles.</p>
+        <p>I'm so proud of you and your passion for cybersecurity. You're amazing at what you do!</p>
+        <p class="mt-4">With all my love,</p>
+        <p><strong>Varesh</strong> <span class="heart"><i class="fas fa-heart"></i></span></p>
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>
+
+<!-- Confetti container (for celebration) -->
+<div class="confetti-container" id="confetti-container"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Clear all completed challenges on page load to start fresh
+    localStorage.removeItem('completedChallenges');
+    localStorage.setItem('completedChallenges', JSON.stringify([]));
+    console.log('Reset: All challenges cleared');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('All challenges page loaded');
+        
+        // Challenge 1
+        const checkButton1 = document.getElementById('check-button-1');
+        const answer1 = document.getElementById('answer1');
+        const successMessage1 = document.getElementById('success-message-1');
+        const errorMessage1 = document.getElementById('error-message-1');
+        
+        // Challenge 2
+        const checkButton2 = document.getElementById('check-button-2');
+        const answer2 = document.getElementById('answer2');
+        const successMessage2 = document.getElementById('success-message-2');
+        const errorMessage2 = document.getElementById('error-message-2');
+        
+        // Challenge 3
+        const checkButton3 = document.getElementById('check-button-3');
+        const answer3 = document.getElementById('answer3');
+        const secretMessage = document.getElementById('secret-message');
+        const errorMessage3 = document.getElementById('error-message-3');
+        
+        // Add event listeners
+        if (checkButton1) {
+            checkButton1.addEventListener('click', function() {
+                checkAnswer1();
+            });
+            if (answer1) {
+                answer1.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        checkAnswer1();
+                    }
+                });
+            }
+        }
+        
+        if (checkButton2) {
+            checkButton2.addEventListener('click', function() {
+                checkAnswer2();
+            });
+            if (answer2) {
+                answer2.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        checkAnswer2();
+                    }
+                });
+            }
+        }
+        
+        if (checkButton3) {
+            checkButton3.addEventListener('click', function() {
+                processCommand();
+            });
+            if (answer3) {
+                answer3.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        processCommand();
+                    }
+                });
+            }
+        }
+    });
+    
+    // Function to check Challenge 1 (Caesar cipher)
+    function checkAnswer1() {
+        console.log('Checking Challenge 1 answer');
+        const answer = document.getElementById('answer1').value;
+        const answerLower = answer.toLowerCase();
+        const checkButton = document.getElementById('check-button-1');
+        
+        // Disable button while checking
+        if (checkButton) checkButton.disabled = true;
+        
+        // Normalize the answer by removing punctuation and extra spaces
+        const normalized = answerLower.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+        console.log("Normalized answer:", normalized);
+        
+        let isCorrect = false;
+        
+        // Simple check for key phrases
+        if ((normalized.includes("happy birthday") && normalized.includes("queen lisa")) || 
+            (normalized.includes("happy birthday") && normalized.includes("cybersecurity"))) {
+            isCorrect = true;
+        }
+        
+        if (isCorrect) {
+            // Mark as complete
+            markChallengeComplete(1);
+            
+            // Update UI
+            const successMessage = document.getElementById('success-message-1');
+            const errorMessage = document.getElementById('error-message-1');
+            
+            if (errorMessage) errorMessage.style.display = 'none';
+            if (successMessage) successMessage.style.display = 'block';
+            
+            // Update progress
+            updateProgress();
+            
+            // Disable input
+            document.getElementById('answer1').disabled = true;
+            
+            // Scroll to success message
+            setTimeout(function() {
+                if (successMessage) {
+                    successMessage.scrollIntoView({behavior: 'smooth'});
+                }
+            }, 100);
+        } else {
+            // Show error
+            const errorMessage = document.getElementById('error-message-1');
+            const successMessage = document.getElementById('success-message-1');
+            
+            if (successMessage) successMessage.style.display = 'none';
+            if (errorMessage) errorMessage.style.display = 'block';
+            
+            // Re-enable button
+            if (checkButton) checkButton.disabled = false;
+        }
+    }
+    
+    // Function to check Challenge 2 (Vigenère cipher)
+    function checkAnswer2() {
+        console.log('Checking Challenge 2 answer');
+        const answer = document.getElementById('answer2').value;
+        const answerLower = answer.toLowerCase();
+        const checkButton = document.getElementById('check-button-2');
+        
+        // Disable button while checking
+        if (checkButton) checkButton.disabled = true;
+        
+        // Normalize the answer by removing punctuation and extra spaces
+        const normalized = answerLower.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+        console.log("Normalized answer:", normalized);
+        
+        let isCorrect = false;
+        
+        // Check for key phrases
+        if ((normalized.includes("i love you") || normalized.includes("love you")) && 
+            (normalized.includes("liz") || normalized.includes("lisa")) && 
+            (normalized.includes("incredible") || normalized.includes("hacker"))) {
+            isCorrect = true;
+        }
+        
+        if (isCorrect) {
+            // Mark as complete
+            markChallengeComplete(2);
+            
+            // Update UI
+            const successMessage = document.getElementById('success-message-2');
+            const errorMessage = document.getElementById('error-message-2');
+            
+            if (errorMessage) errorMessage.style.display = 'none';
+            if (successMessage) successMessage.style.display = 'block';
+            
+            // Update progress
+            updateProgress();
+            
+            // Disable input
+            document.getElementById('answer2').disabled = true;
+            
+            // Scroll to success message
+            setTimeout(function() {
+                if (successMessage) {
+                    successMessage.scrollIntoView({behavior: 'smooth'});
+                }
+            }, 100);
+        } else {
+            // Show error
+            const errorMessage = document.getElementById('error-message-2');
+            const successMessage = document.getElementById('success-message-2');
+            
+            if (successMessage) successMessage.style.display = 'none';
+            if (errorMessage) errorMessage.style.display = 'block';
+            
+            // Re-enable button
+            if (checkButton) checkButton.disabled = false;
+        }
+    }
+    
+    // Function to process command for Challenge 3 (Base64 decode)
+    function processCommand() {
+        console.log('Processing Challenge 3 command');
+        const command = document.getElementById('answer3').value;
+        const checkButton = document.getElementById('check-button-3');
+        
+        // Disable button while checking
+        if (checkButton) checkButton.disabled = true;
+        
+        // Normalize command - remove spaces, special characters, case insensitive
+        const normalizedCommand = command.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        console.log("Normalized command:", normalizedCommand);
+        
+        if (normalizedCommand === 'DECODE') {
+            // Mark as complete
+            markChallengeComplete(3);
+            
+            // Update UI
+            const errorMessage = document.getElementById('error-message-3');
+            const secretMessage = document.getElementById('secret-message');
+            
+            if (errorMessage) errorMessage.style.display = 'none';
+            if (secretMessage) secretMessage.style.display = 'block';
+            
+            // Update progress
+            updateProgress();
+            
+            // Disable input
+            document.getElementById('answer3').disabled = true;
+            
+            // Add celebration effects
+            setTimeout(function() {
+                // Start confetti
+                startConfetti();
+                
+                // Update header
+                document.getElementById('challenge-status-heading').textContent = '🎉 All Challenges Completed! 🎉';
+                document.getElementById('challenge-status-message').textContent = 'Congratulations! You\'ve solved all the cryptography challenges!';
+                
+                // Scroll to message
+                if (secretMessage) {
+                    secretMessage.scrollIntoView({behavior: 'smooth'});
+                }
+            }, 100);
+        } else {
+            // Show error
+            const errorMessage = document.getElementById('error-message-3');
+            
+            if (errorMessage) errorMessage.style.display = 'block';
+            
+            // Re-enable button
+            if (checkButton) checkButton.disabled = false;
+        }
+    }
+    
+    // Function to mark a challenge as complete
+    function markChallengeComplete(challengeNum) {
+        try {
+            // Get current challenges or initialize new array
+            let completedChallenges = localStorage.getItem('completedChallenges');
+            let challenges = [];
+            
+            if (completedChallenges) {
+                try {
+                    challenges = JSON.parse(completedChallenges);
+                    if (!Array.isArray(challenges)) {
+                        challenges = [];
+                    }
+                } catch (e) {
+                    console.error('Error parsing challenges:', e);
+                    challenges = [];
+                }
+            }
+            
+            // Add the challenge if not already included
+            if (!challenges.includes(challengeNum)) {
+                challenges.push(challengeNum);
+                localStorage.setItem('completedChallenges', JSON.stringify(challenges));
+                console.log(`Challenge ${challengeNum} marked as complete:`, challenges);
+            } else {
+                console.log(`Challenge ${challengeNum} was already completed`);
+            }
+        } catch (e) {
+            console.error('Error marking challenge complete:', e);
+        }
+    }
+    
+    // Function to unlock the next challenge
+    function unlockNextChallenge(nextChallenge) {
+        const nextSection = document.getElementById(`challenge-${nextChallenge}-section`);
+        if (nextSection) {
+            nextSection.classList.remove('locked');
+            nextSection.scrollIntoView({behavior: 'smooth'});
+        }
+    }
+    
+    // Function to update the progress bar
+    function updateProgress() {
+        try {
+            let completedChallenges = localStorage.getItem('completedChallenges');
+            let challenges = [];
+            
+            if (completedChallenges) {
+                challenges = JSON.parse(completedChallenges);
+                if (!Array.isArray(challenges)) challenges = [];
+            }
+            
+            const totalComplete = challenges.length;
+            const progressPercent = Math.round((totalComplete / 3) * 100);
+            
+            const progressBar = document.getElementById('challenge-progress');
+            if (progressBar) {
+                progressBar.style.width = `${progressPercent}%`;
+                progressBar.textContent = `${progressPercent}%`;
+                progressBar.setAttribute('aria-valuenow', progressPercent);
+            }
+            
+            // Mark challenge sections as completed
+            challenges.forEach(challengeNum => {
+                const section = document.getElementById(`challenge-${challengeNum}-section`);
+                if (section) {
+                    section.classList.add('completed');
+                }
+                
+                // If the next challenge exists, unlock it
+                if (challengeNum < 3) {
+                    const nextSection = document.getElementById(`challenge-${challengeNum + 1}-section`);
+                    if (nextSection) {
+                        nextSection.classList.remove('locked');
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('Error updating progress:', e);
+        }
+    }
+    
+    // Generate confetti for celebration
+    function startConfetti() {
+        console.log('Starting confetti celebration');
+        const confettiContainer = document.getElementById('confetti-container');
+        if (!confettiContainer) {
+            console.error('Confetti container not found');
+            return;
+        }
+        
+        confettiContainer.style.display = 'block';
+        confettiContainer.innerHTML = ''; // Clear any existing confetti
+        
+        // Create confetti pieces
+        const colors = ['#9c27b0', '#e91e63', '#2196f3', '#4caf50', '#ff9800'];
+        
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            // Random position, color, and animation delay
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = Math.random() * 10 + 5 + 'px';
+            confetti.style.height = Math.random() * 10 + 5 + 'px';
+            confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+            confetti.style.animationDelay = Math.random() * 5 + 's';
+            
+            confettiContainer.appendChild(confetti);
+        }
+    }
+</script>
+{% endblock %} 

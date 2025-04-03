@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Birthday Cryptography Challenge{% endblock %}
+
+{% block extra_css %}
+<style>
+    .challenge-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .challenge-card {
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .challenge-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(156, 39, 176, 0.2);
+    }
+    
+    .challenge-card.completed {
+        border-left-color: #4CAF50;
+    }
+    
+    .challenge-card.completed .card-header {
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+    
+    .challenge-card.completed .challenge-icon {
+        color: #4CAF50;
+    }
+    
+    .completion-badge {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10px;
+        font-size: 14px;
+    }
+    
+    .secret-message {
+        background-color: rgba(156, 39, 176, 0.1);
+        border: 2px dashed var(--primary-color);
+        border-radius: 10px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+    }
+    
+    .progress-container {
+        margin: 20px 0;
+    }
+    
+    .progress {
+        height: 10px;
+        background-color: #333;
+    }
+    
+    .progress-bar {
+        background-color: var(--primary-color);
+        transition: width 0.5s ease;
+    }
+    
+    .locked-challenge {
+        opacity: 0.6;
+        position: relative;
+    }
+    
+    .locked-challenge .card-body:after {
+        content: "Complete the previous challenge first";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 1.2rem;
+        border-radius: 0 0 10px 0;
+    }
+    
+    .unlock-all {
+        margin-top: 30px;
+    }
+    
+    .challenge-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+    }
+    
+    .celebration-icon {
+        animation: celebrate 2s infinite;
+    }
+    
+    @keyframes celebrate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-gift me-3"></i>Birthday Cryptography Challenge<i class="fas fa-gift ms-3"></i></h1>
+    <p>Solve these special birthday challenges to reveal a secret message</p>
+</div>
+
+<div class="challenge-container">
+    <div class="secret-message mb-4">
+        <div class="challenge-icon celebration-icon">
+            <i class="fas fa-birthday-cake"></i>
+        </div>
+        <h2 class="mb-3">Happy Birthday, Liz!</h2>
+        <p class="lead">Complete all three cryptography challenges to reveal a special birthday message just for you.</p>
+        <p>Each challenge will test different cryptography skills. Start with Challenge 1 and make your way to the final surprise!</p>
+    </div>
+    
+    <!-- Challenge 1: Caesar Cipher -->
+    <div class="card challenge-card" id="challenge-1">
+        <div class="card-header">
+            <h4><i class="fas fa-exchange-alt me-2"></i>Challenge 1: Caesar Cipher</h4>
+        </div>
+        <div class="card-body">
+            <div class="text-center">
+                <div class="challenge-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="mb-3">Caesar Cipher Challenge</h3>
+                <p>Decrypt a message encrypted with the Caesar cipher, one of the oldest encryption techniques.</p>
+                <p class="text-muted">Hint: The shift key is your birth date (4)</p>
+                <a href="/challenge1" class="btn btn-primary btn-lg mt-3">Start Challenge 1</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Challenge 2: Vigenère Cipher -->
+    <div class="card challenge-card" id="challenge-2">
+        <div class="card-header">
+            <h4><i class="fas fa-table me-2"></i>Challenge 2: Vigenère Cipher</h4>
+        </div>
+        <div class="card-body">
+            <div class="text-center">
+                <div class="challenge-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3 class="mb-3">Vigenère Cipher Challenge</h3>
+                <p>Crack a message encrypted with the Vigenère cipher, which uses a keyword for polyalphabetic substitution.</p>
+                <p class="text-muted">Hint: The key is the month of your birthday ("april")</p>
+                <a href="/challenge2" class="btn btn-primary btn-lg mt-3">Start Challenge 2</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Challenge 3: Base64 Decoding -->
+    <div class="card challenge-card" id="challenge-3">
+        <div class="card-header">
+            <h4><i class="fas fa-code me-2"></i>Challenge 3: Base64 Encoded Message</h4>
+        </div>
+        <div class="card-body">
+            <div class="text-center">
+                <div class="challenge-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3 class="mb-3">Final Challenge</h3>
+                <p>Decode the final Base64 encoded message to reveal your special birthday surprise!</p>
+                <p class="text-muted">Hint: Enter "DECODE" to reveal the message</p>
+                <a href="/challenge3" class="btn btn-primary btn-lg mt-3">Start Final Challenge</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center unlock-all">
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Force reset on page load by clearing challenge data completely
+    localStorage.removeItem('completedChallenges');
+    localStorage.setItem('completedChallenges', JSON.stringify([]));
+    console.log('Reset: Challenge data cleared');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Challenge splash page loaded');
+        
+        // Check for completed challenges in localStorage
+        const completedChallenges = localStorage.getItem('completedChallenges');
+        if (completedChallenges) {
+            const challenges = JSON.parse(completedChallenges);
+            
+            // Mark completed challenges
+            challenges.forEach(function(challengeNum) {
+                const challengeCard = document.getElementById('challenge-' + challengeNum);
+                if (challengeCard) {
+                    // Add completed class
+                    challengeCard.classList.add('completed');
+                    
+                    // Add completion badge to header
+                    const header = challengeCard.querySelector('.card-header h4');
+                    if (header && !header.querySelector('.completion-badge')) {
+                        const badge = document.createElement('span');
+                        badge.className = 'completion-badge';
+                        badge.innerHTML = '<i class="fas fa-check"></i>';
+                        header.appendChild(badge);
+                    }
+                    
+                    // Update button text if it exists
+                    const button = challengeCard.querySelector('.btn-primary');
+                    if (button) {
+                        button.innerHTML = '<i class="fas fa-redo-alt me-2"></i>Revisit Challenge';
+                        button.classList.remove('btn-primary');
+                        button.classList.add('btn-success');
+                    }
+                }
+            });
+            
+            // Update progress message
+            const totalComplete = challenges.length;
+            if (totalComplete === 3) {
+                const secretMsg = document.querySelector('.secret-message h2');
+                if (secretMsg) {
+                    secretMsg.innerHTML = '🎉 All Challenges Completed! 🎉';
+                }
+                
+                const secretMsgP = document.querySelector('.secret-message p.lead');
+                if (secretMsgP) {
+                    secretMsgP.innerHTML = 'Congratulations! You\'ve solved all the cryptography challenges. You can revisit any challenge or view the final birthday message.';
+                }
+                
+                // Add a direct link to the final message
+                const secretMsgDiv = document.querySelector('.secret-message');
+                if (secretMsgDiv && !document.getElementById('view-final-message')) {
+                    const finalBtn = document.createElement('a');
+                    finalBtn.href = '/challenge3';
+                    finalBtn.className = 'btn btn-lg btn-success mt-4';
+                    finalBtn.id = 'view-final-message';
+                    finalBtn.innerHTML = '<i class="fas fa-gift me-2"></i>View Birthday Message';
+                    secretMsgDiv.appendChild(finalBtn);
+                }
+            }
+        } else {
+            // Initialize completed challenges if first time
+            localStorage.setItem('completedChallenges', JSON.stringify([]));
+        }
+    });
+</script>
+{% endblock %} 

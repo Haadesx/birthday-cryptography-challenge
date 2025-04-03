@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+
+{% block title %}Steganography Tools{% endblock %}
+
+{% block extra_css %}
+<style>
+    .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        margin: 20px auto;
+        display: block;
+        border: 2px solid #444;
+        border-radius: 8px;
+    }
+    
+    .stego-container {
+        border-left: 3px solid var(--secondary-color);
+        padding-left: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stego-info {
+        background-color: rgba(33, 150, 243, 0.1);
+        border: 1px solid var(--secondary-color);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    .file-upload-input {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: 40px;
+        margin: 0;
+        padding: 0;
+        display: block;
+        cursor: pointer;
+        opacity: 0;
+    }
+    
+    .file-upload-text {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        background-color: #333;
+        border: 1px solid #444;
+        border-radius: 6px;
+        color: #bbb;
+        cursor: pointer;
+    }
+    
+    .file-upload-text:after {
+        content: 'Browse';
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: var(--secondary-color);
+        color: white;
+        font-size: 14px;
+        height: 100%;
+        width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0 5px 5px 0;
+    }
+    
+    .image-card {
+        background-color: #1e1e1e;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-eye-slash me-3"></i>Steganography<i class="fas fa-eye-slash ms-3"></i></h1>
+    <p>Hide secret messages in images using LSB steganography</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-info-circle me-2"></i>What is Steganography?</h4>
+            </div>
+            <div class="card-body">
+                <p>Steganography is the practice of concealing a file, message, image, or video within another file, message, image, or video.</p>
+                
+                <div class="stego-info">
+                    <h5><i class="fas fa-lightbulb me-2"></i>How it Works</h5>
+                    <p>This tool uses the LSB (Least Significant Bit) technique to hide data in images:</p>
+                    <ol>
+                        <li>Your message is encrypted using a password</li>
+                        <li>The encrypted data is converted to binary</li>
+                        <li>Each bit is stored in the least significant bit of image pixels</li>
+                        <li>The changes are visually imperceptible</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Remember your password! Without it, you won't be able to recover the hidden message.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <ul class="nav nav-tabs" id="stegoTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="hide-tab" data-bs-toggle="tab" data-bs-target="#hide" type="button" role="tab" aria-controls="hide" aria-selected="true">
+                    <i class="fas fa-hide me-1"></i>Hide Message
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reveal-tab" data-bs-toggle="tab" data-bs-target="#reveal" type="button" role="tab" aria-controls="reveal" aria-selected="false">
+                    <i class="fas fa-search me-1"></i>Reveal Message
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content mt-3" id="stegoTabContent">
+            <!-- Hide Message Tab -->
+            <div class="tab-pane fade show active" id="hide" role="tabpanel" aria-labelledby="hide-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-hide me-2"></i>Hide a Secret Message</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="hide-form" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="hide-message" class="form-label">Secret Message</label>
+                                <textarea class="form-control" id="hide-message" name="message" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="hide-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="hide-password" name="password" required>
+                                <div class="form-text text-light">You'll need this password to reveal the message later.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="hide-image" class="form-label">Select Image</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" class="file-upload-input" id="hide-image" name="image" accept="image/*" required>
+                                    <div class="file-upload-text"><i class="fas fa-image me-2"></i>Choose an image file...</div>
+                                </div>
+                                <div class="form-text text-light">Supported formats: JPG, PNG, GIF</div>
+                            </div>
+                            
+                            <div id="hide-preview-container" style="display: none;">
+                                <h5>Image Preview:</h5>
+                                <img id="hide-preview" class="image-preview" src="" alt="Preview">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="fas fa-hide me-2"></i>Hide Message
+                            </button>
+                        </form>
+                        
+                        <div id="hide-result" style="display: none;">
+                            <div class="alert alert-success mt-4">
+                                <i class="fas fa-check-circle me-2"></i>Message hidden successfully!
+                            </div>
+                            
+                            <div class="image-card">
+                                <h5>Your image with hidden message:</h5>
+                                <img id="result-image" class="image-preview" src="" alt="Result Image">
+                                <a id="download-link" href="#" class="btn btn-secondary mt-3" download>
+                                    <i class="fas fa-download me-2"></i>Download Image
+                                </a>
+                            </div>
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>To reveal the message later, you'll need this image and the password you used.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reveal Message Tab -->
+            <div class="tab-pane fade" id="reveal" role="tabpanel" aria-labelledby="reveal-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-search me-2"></i>Reveal a Hidden Message</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="reveal-form" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="reveal-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="reveal-password" name="password" required>
+                                <div class="form-text text-light">Enter the password that was used to hide the message.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="reveal-image" class="form-label">Select Image with Hidden Message</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" class="file-upload-input" id="reveal-image" name="image" accept="image/*" required>
+                                    <div class="file-upload-text"><i class="fas fa-image me-2"></i>Choose an image file...</div>
+                                </div>
+                            </div>
+                            
+                            <div id="reveal-preview-container" style="display: none;">
+                                <h5>Image Preview:</h5>
+                                <img id="reveal-preview" class="image-preview" src="" alt="Preview">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="fas fa-search me-2"></i>Reveal Message
+                            </button>
+                        </form>
+                        
+                        <div id="reveal-result" style="display: none;">
+                            <div class="alert alert-success mt-4">
+                                <i class="fas fa-check-circle me-2"></i>Hidden message revealed!
+                            </div>
+                            
+                            <div class="card bg-dark mt-3">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-envelope-open-text me-2"></i>Hidden Message</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="code-display" id="revealed-message"></div>
+                                    <button id="copy-revealed" class="btn btn-secondary mt-2">
+                                        <i class="fas fa-copy me-2"></i>Copy Message
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // File upload preview for hiding
+    document.getElementById('hide-image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                document.getElementById('hide-preview').src = e.target.result;
+                document.getElementById('hide-preview-container').style.display = 'block';
+            }
+            
+            reader.readAsDataURL(file);
+            
+            // Update file name in the UI
+            this.previousElementSibling.textContent = file.name;
+        }
+    });
+    
+    // File upload preview for revealing
+    document.getElementById('reveal-image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                document.getElementById('reveal-preview').src = e.target.result;
+                document.getElementById('reveal-preview-container').style.display = 'block';
+            }
+            
+            reader.readAsDataURL(file);
+            
+            // Update file name in the UI
+            this.previousElementSibling.textContent = file.name;
+        }
+    });
+    
+    // Hide message form submission
+    document.getElementById('hide-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('message', document.getElementById('hide-message').value);
+        formData.append('password', document.getElementById('hide-password').value);
+        formData.append('image', document.getElementById('hide-image').files[0]);
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        submitBtn.disabled = true;
+        
+        fetch('/api/encode-image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset button state
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            
+            if (data.success) {
+                // Display success result
+                document.getElementById('hide-result').style.display = 'block';
+                
+                // Set the image source and download link
+                const downloadUrl = '/download/' + data.filename;
+                document.getElementById('result-image').src = downloadUrl;
+                document.getElementById('download-link').href = downloadUrl;
+                
+                // Scroll to the result
+                document.getElementById('hide-result').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            // Reset button state
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            
+            console.error('Error:', error);
+            alert('An error occurred while processing the image.');
+        });
+    });
+    
+    // Reveal message form submission
+    document.getElementById('reveal-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('password', document.getElementById('reveal-password').value);
+        formData.append('image', document.getElementById('reveal-image').files[0]);
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        submitBtn.disabled = true;
+        
+        fetch('/api/decode-image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset button state
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            
+            if (data.success) {
+                // Display the revealed message
+                document.getElementById('revealed-message').textContent = data.message;
+                document.getElementById('reveal-result').style.display = 'block';
+                
+                // Scroll to the result
+                document.getElementById('reveal-result').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            // Reset button state
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            
+            console.error('Error:', error);
+            alert('An error occurred while decoding the image.');
+        });
+    });
+    
+    // Copy revealed message to clipboard
+    document.getElementById('copy-revealed').addEventListener('click', function() {
+        const text = document.getElementById('revealed-message').textContent;
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Message copied to clipboard!');
+    });
+</script>
+{% endblock %} 

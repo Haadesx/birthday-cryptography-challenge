@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block title %}Final Challenge: Base64 Encoded Message{% endblock %}
+
+{% block extra_css %}
+<style>
+    .challenge-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .challenge-card {
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 30px;
+    }
+    
+    .code-display {
+        background-color: #1e1e1e;
+        color: #9cdcfe;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .challenge-hint {
+        font-style: italic;
+        color: #aaa;
+        margin-top: 10px;
+    }
+    
+    .action-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+    }
+    
+    .secret-message {
+        background-color: rgba(156, 39, 176, 0.1);
+        border: 2px dashed var(--primary-color);
+        border-radius: 10px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+    }
+    
+    .celebrate {
+        animation: celebrate 2s infinite;
+    }
+    
+    @keyframes celebrate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
+    
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: var(--primary-color);
+        opacity: 0.8;
+        animation: fall 5s ease-in infinite;
+    }
+    
+    @keyframes fall {
+        0% {
+            top: -10%;
+            transform: translateX(0) rotate(0deg);
+        }
+        100% {
+            top: 100%;
+            transform: translateX(100px) rotate(360deg);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-code me-3"></i>Final Challenge: Base64 Encoded Message</h1>
+    <p>Solve this final challenge to reveal your special birthday message</p>
+</div>
+
+<div class="challenge-container">
+    <div class="card challenge-card" id="challenge-3">
+        <div class="card-header">
+            <h4><i class="fas fa-code me-2"></i>Final Challenge: Base64 Encoded Message</h4>
+        </div>
+        <div class="card-body">
+            <p>Base64 is a group of binary-to-text encoding schemes that represent binary data in an ASCII string format. It's commonly used to encode binary data so it can be safely transmitted over text-based systems.</p>
+            
+            <div class="code-display">
+                SSBsb3ZlIHlvdSBMaXNhISBZb3UndmUgYmVlbiBteSBqb3kgc2luY2UgT2N0b2JlciA1dGguIFlvdXIgYmVhdXRpZnVsIHNtaWxlLCBicmlsbGlhbnQgbWluZCwgYW5kIGtpbmQgaGVhcnQgbWFrZSBtZSBmYWxsIGluIGxvdmUgd2l0aCB5b3UgZXZlcnkgZGF5LiBIYXBweSBCaXJ0aGRheSwgbXkgZGFybGluZyEgLSBZb3VyIFBhZ2Fs
+            </div>
+            
+            <p class="challenge-hint"><i class="fas fa-lightbulb me-2"></i>Hint: Enter "DECODE" to reveal the special birthday message</p>
+            
+            <div class="mb-4">
+                <label for="decode-input" class="form-label">Enter the command:</label>
+                <input type="text" class="form-control" id="decode-input" placeholder="Enter the decode command here">
+            </div>
+            
+            <div class="text-center mt-4">
+                <button id="process-button" class="btn btn-primary btn-lg py-3 px-5 fs-4 w-100">
+                    <i class="fas fa-terminal me-2"></i> Process Command
+                </button>
+            </div>
+            
+            <div class="alert alert-danger mt-4" id="error-message" style="display: none;">
+                <i class="fas fa-times-circle me-2"></i>That's not the correct command. Try entering "DECODE" (case insensitive).
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/challenge2" class="btn btn-secondary action-button">
+                    <i class="fas fa-arrow-left me-2"></i> Previous Challenge
+                </a>
+                <a href="/birthday-challenge" class="btn btn-secondary action-button">
+                    <i class="fas fa-list me-2"></i> All Challenges
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Secret Message (revealed after completing challenge) -->
+    <div class="secret-message" id="secret-message" style="display: none;">
+        <h2 class="mb-4 celebrate">🎉 Happy 22nd Birthday, Liz! 🎉</h2>
+        <div class="code-display" id="decoded-message">
+            I love you Lisa! You've been my joy since October 5th. Your beautiful smile, brilliant mind, and kind heart make me fall in love with you every day. Happy Birthday, my darling! - Your Pagal
+        </div>
+        <p class="mt-4">You've successfully completed all the cryptography challenges! I hope you enjoyed this little gift I made especially for you, combining your love for cybersecurity with some fun puzzles.</p>
+        <p>I'm so proud of you and your passion for cybersecurity. You're amazing at what you do!</p>
+        <p class="mt-4">With all my love,</p>
+        <p><strong>Varesh</strong> <span class="heart"><i class="fas fa-heart"></i></span></p>
+        
+        <div class="mt-4">
+            <a href="/" class="btn btn-primary btn-lg me-3">Return to Home</a>
+            <a href="/birthday-challenge" class="btn btn-success btn-lg" onclick="markChallengeComplete()">Back to Challenges</a>
+        </div>
+    </div>
+</div>
+
+<!-- Confetti container (for celebration) -->
+<div class="confetti-container" id="confetti-container"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize global variables
+    let processButton = null;
+    let decodeInput = null;
+    let secretMessage = null;
+    let errorMessage = null;
+    
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Challenge 3 page loaded');
+        
+        // Get DOM elements
+        processButton = document.getElementById('process-button');
+        decodeInput = document.getElementById('decode-input');
+        secretMessage = document.getElementById('secret-message');
+        errorMessage = document.getElementById('error-message');
+        
+        // Check if previous challenges are completed
+        const completedChallenges = localStorage.getItem('completedChallenges');
+        if (completedChallenges) {
+            const challenges = JSON.parse(completedChallenges);
+            
+            // Check if Challenge 1 is completed
+            if (!challenges.includes(1)) {
+                console.log('Challenge 1 not completed, redirecting back');
+                // Add a message to inform user they need to complete Challenge 1 first
+                alert("You need to complete Challenge 1 before attempting Challenge 3!");
+                // Redirect to Challenge 1
+                window.location.href = '/challenge1';
+                return;
+            }
+            
+            // Check if Challenge 2 is completed
+            if (!challenges.includes(2)) {
+                console.log('Challenge 2 not completed, redirecting back');
+                // Add a message to inform user they need to complete Challenge 2 first
+                alert("You need to complete Challenge 2 before attempting Challenge 3!");
+                // Redirect to Challenge 2
+                window.location.href = '/challenge2';
+                return;
+            }
+            
+            // Check if this challenge has been completed before
+            if (challenges.includes(3)) {
+                console.log('Challenge 3 already completed');
+                // If already completed, don't auto-reveal the message
+                // Let user go through the process again if they want
+            }
+        } else {
+            // Initialize completed challenges if first time
+            localStorage.setItem('completedChallenges', JSON.stringify([]));
+            // Redirect to Challenge 1 as it's not completed
+            alert("You need to complete Challenge 1 and 2 before attempting Challenge 3!");
+            window.location.href = '/challenge1';
+            return;
+        }
+        
+        // Add event listener to the process button
+        if (processButton) {
+            console.log('Adding event listener to process button in Challenge 3');
+            processButton.addEventListener('click', handleCommandCheck);
+            
+            // Also add keypress handler for the input field
+            if (decodeInput) {
+                decodeInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handleCommandCheck();
+                    }
+                });
+            }
+        } else {
+            console.error('Process button not found in Challenge 3!');
+        }
+    });
+    
+    function handleCommandCheck() {
+        console.log('Challenge 3: Process button clicked');
+        
+        // Disable the button while processing to prevent multiple clicks
+        if (processButton) {
+            processButton.disabled = true;
+        }
+        
+        if (!decodeInput) {
+            console.error('Decode input not found in Challenge 3');
+            if (processButton) processButton.disabled = false;
+            return;
+        }
+        
+        const command = decodeInput.value;
+        
+        // Normalize command - remove spaces, special characters, case insensitive
+        const normalizedCommand = command.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        console.log("Normalized command:", normalizedCommand);
+        
+        if (normalizedCommand === 'DECODE') {
+            // First mark the challenge as complete to ensure it's saved
+            markChallengeComplete();
+            
+            // Then handle the UI updates
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+            
+            if (secretMessage) {
+                // Important: Set this directly
+                secretMessage.style.display = 'block';
+                
+                // Disable the input to prevent further changes
+                if (decodeInput) {
+                    decodeInput.disabled = true;
+                }
+                
+                // Add a small delay before animations
+                setTimeout(function() {
+                    try {
+                        // Start confetti
+                        startConfetti();
+                        
+                        // Scroll to message
+                        secretMessage.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    } catch (e) {
+                        console.error('Error with animations:', e);
+                    }
+                }, 100);
+            } else {
+                console.error('Secret message element not found in Challenge 3');
+            }
+        } else {
+            // Show error message
+            if (errorMessage) {
+                errorMessage.style.display = 'block';
+            }
+            
+            // Re-enable the button
+            if (processButton) {
+                processButton.disabled = false;
+            }
+        }
+    }
+    
+    function markChallengeComplete() {
+        try {
+            // Get current challenges or initialize new array
+            let completedChallenges = localStorage.getItem('completedChallenges');
+            let challenges = [];
+            
+            if (completedChallenges) {
+                try {
+                    challenges = JSON.parse(completedChallenges);
+                    if (!Array.isArray(challenges)) {
+                        challenges = [];
+                    }
+                } catch (e) {
+                    console.error('Error parsing challenges:', e);
+                    challenges = [];
+                }
+            }
+            
+            // Add challenge 3 if not already included
+            if (!challenges.includes(3)) {
+                challenges.push(3);
+                localStorage.setItem('completedChallenges', JSON.stringify(challenges));
+                console.log('Challenge 3 marked as complete:', challenges);
+            } else {
+                console.log('Challenge 3 was already completed');
+            }
+        } catch (e) {
+            console.error('Error marking challenge complete:', e);
+        }
+    }
+    
+    // Generate confetti for celebration
+    function startConfetti() {
+        console.log('Starting confetti celebration');
+        const confettiContainer = document.getElementById('confetti-container');
+        if (!confettiContainer) {
+            console.error('Confetti container not found');
+            return;
+        }
+        
+        confettiContainer.style.display = 'block';
+        
+        // Create confetti pieces
+        const colors = ['#9c27b0', '#e91e63', '#2196f3', '#4caf50', '#ff9800'];
+        
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            // Random position, color, and animation delay
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = Math.random() * 10 + 5 + 'px';
+            confetti.style.height = Math.random() * 10 + 5 + 'px';
+            confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+            confetti.style.animationDelay = Math.random() * 5 + 's';
+            
+            confettiContainer.appendChild(confetti);
+        }
+    }
+</script>
+{% endblock %} 

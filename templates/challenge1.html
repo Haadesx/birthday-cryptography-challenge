@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Challenge 1: Caesar Cipher{% endblock %}
+
+{% block extra_css %}
+<style>
+    .challenge-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .challenge-card {
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 30px;
+    }
+    
+    .code-display {
+        background-color: #1e1e1e;
+        color: #9cdcfe;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .challenge-hint {
+        font-style: italic;
+        color: #aaa;
+        margin-top: 10px;
+    }
+    
+    .action-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-exchange-alt me-3"></i>Challenge 1: Caesar Cipher</h1>
+    <p>Solve this challenge to continue your birthday cryptography adventure</p>
+</div>
+
+<div class="challenge-container">
+    <div class="card challenge-card" id="challenge-1">
+        <div class="card-header">
+            <h4><i class="fas fa-exchange-alt me-2"></i>Challenge 1: Caesar Cipher</h4>
+        </div>
+        <div class="card-body">
+            <p>The Caesar cipher is one of the oldest and simplest forms of encrypting messages. Each letter in the plaintext is shifted a certain number of places down the alphabet.</p>
+            
+            <div class="code-display">
+                lettc fmvxlhec xs qc jezsvmxi gcfivwigyvmxc uyiir pmwe!
+            </div>
+            
+            <p class="challenge-hint"><i class="fas fa-lightbulb me-2"></i>Hint: The shift key is your birth date (4)</p>
+            
+            <div class="mb-4">
+                <label for="answer" class="form-label">Your decryption:</label>
+                <input type="text" class="form-control" id="answer" placeholder="Enter your decryption here">
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <button id="check-button" class="btn btn-primary action-button">Check Answer</button>
+                <a href="/birthday-challenge" class="btn btn-secondary action-button">Back to Challenges</a>
+            </div>
+            
+            <div class="alert alert-success mt-4" id="success-message" style="display: none;">
+                <i class="fas fa-check-circle me-2"></i>Correct! You've decrypted the message: "happy birthday to my favorite cybersecurity queen lisa!"
+                <div class="mt-3">
+                    <a href="/challenge2" class="btn btn-success">Continue to Challenge 2</a>
+                </div>
+            </div>
+            
+            <div class="alert alert-danger mt-4" id="error-message" style="display: none;">
+                <i class="fas fa-times-circle me-2"></i>That's not quite right. Remember, the shift key is 4 (your birth date). Try again!
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize global variables
+    let checkButton = null;
+    let answerInput = null;
+    let successMessage = null;
+    let errorMessage = null;
+    
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Challenge 1 page loaded');
+        
+        // Get DOM elements
+        checkButton = document.getElementById('check-button');
+        answerInput = document.getElementById('answer');
+        successMessage = document.getElementById('success-message');
+        errorMessage = document.getElementById('error-message');
+        
+        // Check if this challenge has been completed before
+        const completedChallenges = localStorage.getItem('completedChallenges');
+        if (completedChallenges) {
+            const challenges = JSON.parse(completedChallenges);
+            if (challenges.includes(1)) {
+                console.log('Challenge 1 already completed');
+                // Show the success message for completed challenges
+                successMessage.style.display = 'block';
+            }
+        } else {
+            // Initialize completed challenges if first time
+            localStorage.setItem('completedChallenges', JSON.stringify([]));
+        }
+    
+        // Check button handler - important to use direct function reference
+        if (checkButton) {
+            console.log('Adding event listener to check button');
+            checkButton.addEventListener('click', handleAnswerCheck);
+            
+            // Also add keypress handler for the input field
+            if (answerInput) {
+                answerInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handleAnswerCheck();
+                    }
+                });
+            }
+        } else {
+            console.error('Check button not found!');
+        }
+    });
+    
+    // Separated the check function for clarity
+    function handleAnswerCheck() {
+        console.log('Check button clicked');
+        if (!answerInput) {
+            console.error('Answer input not found');
+            return;
+        }
+        
+        const answer = answerInput.value;
+        const answerLower = answer.toLowerCase();
+        
+        // Normalize the answer by removing punctuation and extra spaces
+        const normalized = answerLower.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+        console.log("Normalized answer:", normalized);
+        
+        // Simple check for key phrases
+        if ((normalized.includes("happy birthday") && normalized.includes("queen lisa")) || 
+            (normalized.includes("happy birthday") && normalized.includes("cybersecurity"))) {
+            showSuccess();
+            return;
+        }
+        
+        // Fallback to server-side check
+        fetch('/api/challenge-verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                challenge: 'caesar',
+                answer: answer
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.correct) {
+                showSuccess();
+            } else {
+                showError();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError();
+        });
+    }
+    
+    function showSuccess() {
+        console.log('Showing success message');
+        if (successMessage && errorMessage) {
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            markChallengeComplete();
+        } else {
+            console.error('Success or error message elements not found');
+        }
+    }
+    
+    function showError() {
+        console.log('Showing error message');
+        if (errorMessage && successMessage) {
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        } else {
+            console.error('Error or success message elements not found');
+        }
+    }
+    
+    function markChallengeComplete() {
+        // Store completion status in localStorage
+        let completedChallenges = localStorage.getItem('completedChallenges');
+        let challenges = completedChallenges ? JSON.parse(completedChallenges) : [];
+        
+        if (!challenges.includes(1)) {
+            challenges.push(1);
+            localStorage.setItem('completedChallenges', JSON.stringify(challenges));
+            console.log('Challenge 1 marked as complete');
+        }
+    }
+</script>
+{% endblock %} 

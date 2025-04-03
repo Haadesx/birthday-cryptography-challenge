@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}Encryption Tools{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-key me-3"></i>Encryption Tools<i class="fas fa-key ms-3"></i></h1>
+    <p>Explore different encryption methods and create your own secret messages</p>
+</div>
+
+<div class="row">
+    <!-- Left column - Tool selection -->
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-tools me-2"></i>Tools</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <a href="#modern-encryption" class="list-group-item list-group-item-action bg-dark text-light border-secondary" id="modern-encryption-tab">
+                        <i class="fas fa-shield-alt me-2"></i>Modern Encryption
+                    </a>
+                    <a href="#caesar-cipher" class="list-group-item list-group-item-action bg-dark text-light border-secondary" id="caesar-cipher-tab">
+                        <i class="fas fa-exchange-alt me-2"></i>Caesar Cipher
+                    </a>
+                    <a href="#vigenere-cipher" class="list-group-item list-group-item-action bg-dark text-light border-secondary" id="vigenere-cipher-tab">
+                        <i class="fas fa-table me-2"></i>Vigenère Cipher
+                    </a>
+                    <a href="#hash-generator" class="list-group-item list-group-item-action bg-dark text-light border-secondary" id="hash-generator-tab">
+                        <i class="fas fa-hashtag me-2"></i>Hash Generator
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column - Tool content -->
+    <div class="col-md-9">
+        <!-- Modern Encryption -->
+        <div class="card mb-4" id="modern-encryption">
+            <div class="card-header">
+                <h4><i class="fas fa-shield-alt me-2"></i>Modern Encryption (Fernet)</h4>
+            </div>
+            <div class="card-body">
+                <p>Fernet is a symmetric encryption method that guarantees that a message encrypted cannot be manipulated or read without the key.</p>
+                
+                <ul class="nav nav-tabs" id="encryptionTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="encrypt-tab" data-bs-toggle="tab" data-bs-target="#encrypt" type="button" role="tab" aria-controls="encrypt" aria-selected="true">Encrypt</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="decrypt-tab" data-bs-toggle="tab" data-bs-target="#decrypt" type="button" role="tab" aria-controls="decrypt" aria-selected="false">Decrypt</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3" id="encryptionTabContent">
+                    <!-- Encrypt Tab -->
+                    <div class="tab-pane fade show active" id="encrypt" role="tabpanel" aria-labelledby="encrypt-tab">
+                        <form id="encrypt-form">
+                            <div class="mb-3">
+                                <label for="encrypt-message" class="form-label">Message to Encrypt</label>
+                                <textarea class="form-control" id="encrypt-message" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="encrypt-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="encrypt-password" required>
+                                <div class="form-text text-light">This password will be needed to decrypt the message later.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Encrypt</button>
+                        </form>
+                        
+                        <div id="encrypt-result" class="result-container mt-3" style="display: none;">
+                            <h5>Encrypted Message:</h5>
+                            <div class="code-display" id="encrypted-message"></div>
+                            <h5 class="mt-3">Salt (needed for decryption):</h5>
+                            <div class="code-display" id="salt-value"></div>
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Keep both the encrypted message and the salt safe! Both are needed along with your password to decrypt the message.
+                            </div>
+                            <button id="copy-encrypted" class="btn btn-secondary mt-2">
+                                <i class="fas fa-copy me-2"></i>Copy Encrypted Message
+                            </button>
+                            <button id="copy-salt" class="btn btn-secondary mt-2">
+                                <i class="fas fa-copy me-2"></i>Copy Salt
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Decrypt Tab -->
+                    <div class="tab-pane fade" id="decrypt" role="tabpanel" aria-labelledby="decrypt-tab">
+                        <form id="decrypt-form">
+                            <div class="mb-3">
+                                <label for="decrypt-message" class="form-label">Encrypted Message</label>
+                                <textarea class="form-control" id="decrypt-message" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="decrypt-salt" class="form-label">Salt</label>
+                                <input type="text" class="form-control" id="decrypt-salt" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="decrypt-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="decrypt-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Decrypt</button>
+                        </form>
+                        
+                        <div id="decrypt-result" class="result-container mt-3" style="display: none;">
+                            <h5>Decrypted Message:</h5>
+                            <div class="code-display" id="decrypted-message"></div>
+                            <button id="copy-decrypted" class="btn btn-secondary mt-2">
+                                <i class="fas fa-copy me-2"></i>Copy Decrypted Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Caesar Cipher -->
+        <div class="card mb-4" id="caesar-cipher">
+            <div class="card-header">
+                <h4><i class="fas fa-exchange-alt me-2"></i>Caesar Cipher</h4>
+            </div>
+            <div class="card-body">
+                <p>The Caesar cipher is one of the simplest and most widely known encryption techniques. It works by shifting each letter in the plaintext by a certain number of places down the alphabet.</p>
+                
+                <form id="caesar-form">
+                    <div class="mb-3">
+                        <label for="caesar-text" class="form-label">Text</label>
+                        <textarea class="form-control" id="caesar-text" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="caesar-shift" class="form-label">Shift (1-25)</label>
+                                <input type="number" class="form-control" id="caesar-shift" min="1" max="25" value="3" required>
+                                <div class="form-text text-light">For birthday-themed encryption, use your birth date as the shift!</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="caesar-operation" class="form-label">Operation</label>
+                                <select class="form-select" id="caesar-operation">
+                                    <option value="encrypt">Encrypt</option>
+                                    <option value="decrypt">Decrypt</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Process</button>
+                </form>
+                
+                <div id="caesar-result" class="result-container mt-3" style="display: none;">
+                    <h5>Result:</h5>
+                    <div class="code-display" id="caesar-output"></div>
+                    <button id="copy-caesar" class="btn btn-secondary mt-2">
+                        <i class="fas fa-copy me-2"></i>Copy Result
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vigenère Cipher -->
+        <div class="card mb-4" id="vigenere-cipher">
+            <div class="card-header">
+                <h4><i class="fas fa-table me-2"></i>Vigenère Cipher</h4>
+            </div>
+            <div class="card-body">
+                <p>The Vigenère cipher is a method of encrypting alphabetic text by using a simple form of polyalphabetic substitution. It uses a keyword to shift each letter of the plaintext.</p>
+                
+                <form id="vigenere-form">
+                    <div class="mb-3">
+                        <label for="vigenere-text" class="form-label">Text</label>
+                        <textarea class="form-control" id="vigenere-text" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vigenere-key" class="form-label">Key (letters only)</label>
+                                <input type="text" class="form-control" id="vigenere-key" required>
+                                <div class="form-text text-light">For birthday-themed encryption, use your birth month as the key!</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vigenere-operation" class="form-label">Operation</label>
+                                <select class="form-select" id="vigenere-operation">
+                                    <option value="encrypt">Encrypt</option>
+                                    <option value="decrypt">Decrypt</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Process</button>
+                </form>
+                
+                <div id="vigenere-result" class="result-container mt-3" style="display: none;">
+                    <h5>Result:</h5>
+                    <div class="code-display" id="vigenere-output"></div>
+                    <button id="copy-vigenere" class="btn btn-secondary mt-2">
+                        <i class="fas fa-copy me-2"></i>Copy Result
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hash Generator -->
+        <div class="card mb-4" id="hash-generator">
+            <div class="card-header">
+                <h4><i class="fas fa-hashtag me-2"></i>Hash Generator</h4>
+            </div>
+            <div class="card-body">
+                <p>Cryptographic hash functions take an input (or 'message') and return a fixed-size string of bytes, typically a digest that is unique to each unique input. They are one-way functions, meaning they cannot be inverted.</p>
+                
+                <form id="hash-form">
+                    <div class="mb-3">
+                        <label for="hash-text" class="form-label">Text to Hash</label>
+                        <textarea class="form-control" id="hash-text" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Generate Hashes</button>
+                </form>
+                
+                <div id="hash-result" class="result-container mt-3" style="display: none;">
+                    <h5>Hash Results:</h5>
+                    <div class="mb-2">
+                        <strong>MD5:</strong>
+                        <div class="code-display" id="md5-hash"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>SHA-1:</strong>
+                        <div class="code-display" id="sha1-hash"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>SHA-256:</strong>
+                        <div class="code-display" id="sha256-hash"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>SHA-512:</strong>
+                        <div class="code-display" id="sha512-hash"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Modern Encryption - Encrypt
+    document.getElementById('encrypt-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const message = document.getElementById('encrypt-message').value;
+        const password = document.getElementById('encrypt-password').value;
+        
+        fetch('/api/encrypt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('encrypted-message').textContent = data.encrypted_message;
+                document.getElementById('salt-value').textContent = data.salt;
+                document.getElementById('encrypt-result').style.display = 'block';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during encryption.');
+        });
+    });
+    
+    // Modern Encryption - Decrypt
+    document.getElementById('decrypt-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const encryptedMessage = document.getElementById('decrypt-message').value;
+        const salt = document.getElementById('decrypt-salt').value;
+        const password = document.getElementById('decrypt-password').value;
+        
+        fetch('/api/decrypt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                encrypted_message: encryptedMessage,
+                salt: salt,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('decrypted-message').textContent = data.decrypted_message;
+                document.getElementById('decrypt-result').style.display = 'block';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during decryption.');
+        });
+    });
+    
+    // Caesar Cipher
+    document.getElementById('caesar-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const text = document.getElementById('caesar-text').value;
+        const shift = document.getElementById('caesar-shift').value;
+        const operation = document.getElementById('caesar-operation').value;
+        
+        fetch('/api/caesar-cipher', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: text,
+                shift: shift,
+                operation: operation
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('caesar-output').textContent = data.result;
+                document.getElementById('caesar-result').style.display = 'block';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the Caesar cipher.');
+        });
+    });
+    
+    // Vigenère Cipher
+    document.getElementById('vigenere-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const text = document.getElementById('vigenere-text').value;
+        const key = document.getElementById('vigenere-key').value;
+        const operation = document.getElementById('vigenere-operation').value;
+        
+        fetch('/api/vigenere-cipher', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: text,
+                key: key,
+                operation: operation
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('vigenere-output').textContent = data.result;
+                document.getElementById('vigenere-result').style.display = 'block';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the Vigenère cipher.');
+        });
+    });
+    
+    // Hash Generator
+    document.getElementById('hash-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const text = document.getElementById('hash-text').value;
+        
+        fetch('/api/hash', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: text
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('md5-hash').textContent = data.md5;
+                document.getElementById('sha1-hash').textContent = data.sha1;
+                document.getElementById('sha256-hash').textContent = data.sha256;
+                document.getElementById('sha512-hash').textContent = data.sha512;
+                document.getElementById('hash-result').style.display = 'block';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while generating hashes.');
+        });
+    });
+    
+    // Copy buttons functionality
+    document.getElementById('copy-encrypted').addEventListener('click', function() {
+        copyToClipboard(document.getElementById('encrypted-message').textContent);
+        alert('Encrypted message copied to clipboard!');
+    });
+    
+    document.getElementById('copy-salt').addEventListener('click', function() {
+        copyToClipboard(document.getElementById('salt-value').textContent);
+        alert('Salt copied to clipboard!');
+    });
+    
+    document.getElementById('copy-decrypted').addEventListener('click', function() {
+        copyToClipboard(document.getElementById('decrypted-message').textContent);
+        alert('Decrypted message copied to clipboard!');
+    });
+    
+    document.getElementById('copy-caesar').addEventListener('click', function() {
+        copyToClipboard(document.getElementById('caesar-output').textContent);
+        alert('Caesar cipher result copied to clipboard!');
+    });
+    
+    document.getElementById('copy-vigenere').addEventListener('click', function() {
+        copyToClipboard(document.getElementById('vigenere-output').textContent);
+        alert('Vigenère cipher result copied to clipboard!');
+    });
+    
+    // Utility function to copy to clipboard
+    function copyToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+    
+    // Scroll to section when clicking on the side navigation
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = this.getAttribute('href');
+            document.querySelector(target).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
+{% endblock %} 

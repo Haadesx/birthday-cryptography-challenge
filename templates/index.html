@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Birthday Cybersecurity Challenge - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Matrix rain effect */
+    #matrix-canvas {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        opacity: 0.3;
+    }
+    
+    .feature-card {
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(156, 39, 176, 0.3);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+    }
+    
+    .birthday-message {
+        background-color: rgba(156, 39, 176, 0.1);
+        border: 2px solid var(--primary-color);
+        border-radius: 15px;
+        padding: 30px;
+        margin: 40px 0;
+        text-align: center;
+    }
+    
+    .birthday-message h2 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Banner -->
+<div class="banner">
+    <h1><i class="fas fa-lock me-3"></i>Birthday Cybersecurity Challenge<i class="fas fa-lock ms-3"></i></h1>
+    <p>A special gift combining cryptography and steganography</p>
+</div>
+
+<!-- Birthday Message -->
+<div class="birthday-message">
+    <h2 class="mb-4">Happy 22nd Birthday, Liz! <i class="fas fa-birthday-cake ms-2"></i></h2>
+    <p class="lead">To my amazing Lisa who loves cybersecurity,</p>
+    <p>I created this special cybersecurity-themed birthday surprise just for you. Because I know how much you love cryptography and security, I wanted to make something that combines my Python skills with your passion.</p>
+    <p>It's been incredible since we started our journey on October 5th, 2024, and especially since your proposal on October 25th. You make every day special!</p>
+    <p>Explore the different tools, solve the challenges, and enjoy your very own cybersecurity playground!</p>
+    <p class="mt-4">With love,</p>
+    <p><strong>Your Pagal</strong> <span class="heart"><i class="fas fa-heart"></i></span></p>
+</div>
+
+<!-- Features -->
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card feature-card">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3>Encryption Tools</h3>
+                <p>Explore modern and classical encryption methods including Fernet, Caesar and Vigenère ciphers, and create your own encrypted messages.</p>
+                <a href="/encryption" class="btn btn-primary mt-3">Try Encryption</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card feature-card">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-eye-slash"></i>
+                </div>
+                <h3>Steganography</h3>
+                <p>Hide secret messages inside images using LSB steganography techniques. Create and decode hidden messages securely.</p>
+                <a href="/steganography" class="btn btn-primary mt-3">Try Steganography</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card feature-card">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3>Birthday Challenge</h3>
+                <p>Test your cybersecurity skills with special birthday-themed challenges. Solve puzzles to unlock a special message!</p>
+                <a href="/birthday-challenge" class="btn btn-primary mt-3">Take the Challenge</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Brief Explanation -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle me-2"></i>What is This?</h3>
+            </div>
+            <div class="card-body">
+                <p>This web application is a cybersecurity playground that lets you explore:</p>
+                <ul>
+                    <li><strong>Modern Encryption</strong> - Using the Fernet symmetric encryption algorithm</li>
+                    <li><strong>Classical Ciphers</strong> - Including Caesar shift cipher and Vigenère cipher</li>
+                    <li><strong>Cryptographic Hashing</strong> - Generate MD5, SHA-1, SHA-256, and SHA-512 hashes</li>
+                    <li><strong>Steganography</strong> - Hide messages in images using the LSB (Least Significant Bit) technique</li>
+                    <li><strong>Birthday Challenge</strong> - Special cryptographic puzzles that test your skills</li>
+                </ul>
+                <p>All the tools are designed to be educational, fun, and interactive. Enjoy exploring the world of cybersecurity!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Matrix rain effect
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.createElement('canvas');
+        canvas.id = 'matrix-canvas';
+        document.body.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Make canvas full screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Characters to display
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+        
+        // Font size and columns
+        const fontSize = 14;
+        const columns = Math.floor(canvas.width / fontSize);
+        
+        // Create drops array
+        const drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+        
+        // Draw the characters
+        function draw() {
+            // Black background with opacity
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Green text
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            // Loop over drops
+            for(let i = 0; i < drops.length; i++) {
+                // Random character
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                
+                // Draw character
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                // Reset drop if it reaches bottom or randomly
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                // Increment drop
+                drops[i]++;
+            }
+        }
+        
+        // Animation loop
+        setInterval(draw, 33);
+        
+        // Resize canvas when window is resized
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    });
+</script>
+{% endblock %} 

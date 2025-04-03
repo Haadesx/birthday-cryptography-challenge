@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Challenge 2: Vigenère Cipher{% endblock %}
+
+{% block extra_css %}
+<style>
+    .challenge-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .challenge-card {
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 30px;
+    }
+    
+    .code-display {
+        background-color: #1e1e1e;
+        color: #9cdcfe;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .challenge-hint {
+        font-style: italic;
+        color: #aaa;
+        margin-top: 10px;
+    }
+    
+    .action-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+    }
+    
+    .btn-verify {
+        margin-top: 15px;
+        padding: 12px 0;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="banner">
+    <h1><i class="fas fa-table me-3"></i>Challenge 2: Vigenère Cipher</h1>
+    <p>Solve this challenge to continue your birthday cryptography adventure</p>
+</div>
+
+<div class="challenge-container">
+    <div class="card challenge-card" id="challenge-2">
+        <div class="card-header">
+            <h4><i class="fas fa-table me-2"></i>Challenge 2: Vigenère Cipher</h4>
+        </div>
+        <div class="card-body">
+            <p>The Vigenère cipher is a method of encrypting alphabetic text by using a simple form of polyalphabetic substitution. It uses a keyword to shift each letter of the plaintext.</p>
+            
+            <div class="code-display">
+                i afdp ydl ttz, bp qycgvltbav plczvz rigc!
+            </div>
+            
+            <p class="challenge-hint"><i class="fas fa-lightbulb me-2"></i>Hint: The key is the month of your birthday in lowercase ("april")</p>
+            
+            <div class="mb-4">
+                <label for="answer" class="form-label">Your decryption:</label>
+                <input type="text" class="form-control" id="answer" placeholder="Enter your decryption here">
+            </div>
+            
+            <div class="text-center mt-4">
+                <button id="check-button" class="btn btn-primary btn-verify w-100 mb-3">
+                    <i class="fas fa-check-circle me-2"></i> Check Answer
+                </button>
+            </div>
+            
+            <div class="alert alert-success mt-4" id="success-message" style="display: none;">
+                <i class="fas fa-check-circle me-2"></i>Excellent work! You've solved the Vigenère cipher correctly!
+                <div class="mt-3">
+                    <a href="/challenge3" class="btn btn-success">Continue to Final Challenge</a>
+                </div>
+            </div>
+            
+            <div class="alert alert-danger mt-4" id="error-message" style="display: none;">
+                <i class="fas fa-times-circle me-2"></i>That's not quite right. Remember to use "april" as the key. Try again!
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/challenge1" class="btn btn-secondary action-button">
+                    <i class="fas fa-arrow-left me-2"></i> Previous Challenge
+                </a>
+                <a href="/birthday-challenge" class="btn btn-secondary action-button">
+                    <i class="fas fa-list me-2"></i> All Challenges
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize global variables
+    let checkButton = null;
+    let answerInput = null;
+    let successMessage = null;
+    let errorMessage = null;
+    
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Challenge 2 page loaded');
+        
+        // Get DOM elements
+        checkButton = document.getElementById('check-button');
+        answerInput = document.getElementById('answer');
+        successMessage = document.getElementById('success-message');
+        errorMessage = document.getElementById('error-message');
+        
+        // Check if previous challenge is completed
+        const completedChallenges = localStorage.getItem('completedChallenges');
+        if (completedChallenges) {
+            const challenges = JSON.parse(completedChallenges);
+            
+            // Check if Challenge 1 is completed
+            if (!challenges.includes(1)) {
+                console.log('Challenge 1 not completed, redirecting back');
+                // Add a message to inform user they need to complete Challenge 1 first
+                alert("You need to complete Challenge 1 before attempting Challenge 2!");
+                // Redirect to Challenge 1
+                window.location.href = '/challenge1';
+                return;
+            }
+            
+            // Check if this challenge has been completed before
+            if (challenges.includes(2)) {
+                console.log('Challenge 2 already completed');
+                // Show the success message for completed challenges
+                successMessage.style.display = 'block';
+            }
+        } else {
+            // Initialize completed challenges if first time
+            localStorage.setItem('completedChallenges', JSON.stringify([]));
+            // Redirect to Challenge 1 as it's not completed
+            alert("You need to complete Challenge 1 before attempting Challenge 2!");
+            window.location.href = '/challenge1';
+            return;
+        }
+        
+        // Add event listener to the check button
+        if (checkButton) {
+            console.log('Adding event listener to check button in Challenge 2');
+            checkButton.addEventListener('click', handleAnswerCheck);
+            
+            // Also add keypress handler for the input field
+            if (answerInput) {
+                answerInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handleAnswerCheck();
+                    }
+                });
+            }
+        } else {
+            console.error('Check button not found in Challenge 2!');
+        }
+    });
+    
+    function handleAnswerCheck() {
+        console.log('Challenge 2: Check button clicked');
+        
+        // Disable the button while processing to prevent multiple clicks
+        if (checkButton) {
+            checkButton.disabled = true;
+        }
+        
+        if (!answerInput) {
+            console.error('Answer input not found in Challenge 2');
+            if (checkButton) checkButton.disabled = false;
+            return;
+        }
+        
+        const answer = answerInput.value;
+        const answerLower = answer.toLowerCase();
+        
+        // Normalize the answer by removing punctuation and extra spaces
+        const normalized = answerLower.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+        console.log("Normalized answer:", normalized);
+        
+        // Set a flag variable for correct answer
+        let isCorrect = false;
+        
+        // Check for key phrases
+        if ((normalized.includes("i love you") || normalized.includes("love you")) && 
+            (normalized.includes("liz") || normalized.includes("lisa")) && 
+            (normalized.includes("incredible") || normalized.includes("hacker"))) {
+            isCorrect = true;
+        }
+        
+        if (isCorrect) {
+            // First mark the challenge as complete to ensure it's saved
+            markChallengeComplete();
+            
+            // Then show the success UI
+            if (errorMessage) errorMessage.style.display = 'none';
+            if (successMessage) {
+                // Important: Set this directly, not in a function
+                successMessage.style.display = 'block';
+                
+                // Only attempt to scroll after we're sure the message is shown
+                setTimeout(function() {
+                    try {
+                        successMessage.scrollIntoView({behavior: 'smooth'});
+                    } catch (e) {
+                        console.error('Error scrolling to success message:', e);
+                    }
+                }, 100);
+            }
+            
+            // Disable the input field to prevent further edits
+            if (answerInput) {
+                answerInput.disabled = true;
+            }
+        } else {
+            // Show error message
+            if (successMessage) successMessage.style.display = 'none';
+            if (errorMessage) errorMessage.style.display = 'block';
+            if (checkButton) checkButton.disabled = false;
+        }
+    }
+    
+    function markChallengeComplete() {
+        try {
+            // Get current challenges or initialize new array
+            let completedChallenges = localStorage.getItem('completedChallenges');
+            let challenges = [];
+            
+            if (completedChallenges) {
+                try {
+                    challenges = JSON.parse(completedChallenges);
+                    if (!Array.isArray(challenges)) {
+                        challenges = [];
+                    }
+                } catch (e) {
+                    console.error('Error parsing challenges:', e);
+                    challenges = [];
+                }
+            }
+            
+            // Add challenge 2 if not already included
+            if (!challenges.includes(2)) {
+                challenges.push(2);
+                localStorage.setItem('completedChallenges', JSON.stringify(challenges));
+                console.log('Challenge 2 marked as complete:', challenges);
+            } else {
+                console.log('Challenge 2 was already completed');
+            }
+        } catch (e) {
+            console.error('Error marking challenge complete:', e);
+        }
+    }
+</script>
+{% endblock %} 
